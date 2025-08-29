@@ -1,8 +1,8 @@
 {
-  "name": "ai-test-generator",
+  "name": "ai-quiz-generator",
   "private": true,
   "version": "1.0.0",
-  "description": "AI-powered quiz generator with React frontend and FastAPI backend",
+  "description": "AI Quiz Generator - AI-powered quiz generation with React frontend and FastAPI backend",
   "type": "module",
   "scripts": {
     "dev": "vite",
