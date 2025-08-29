@@ -20,8 +20,6 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
   isSubmitted = false
 }) => {
   const correctAnswer = question.correct_answer;
-  const isUserAnswerCorrect = userAnswer === correctAnswer;
-  const isUserAnswerWrong = userAnswer !== -1 && userAnswer !== correctAnswer;
 
   return (
     <div className={styles.questionCard}>

@@ -1,6 +1,6 @@
 import React from "react";
 import { ResultsSectionStyles as styles } from "../cssmodules";
-import type { QuizQuestion, QuizResponse, QuizResult } from "../types/quiz";
+import type { QuizResponse, QuizResult } from "../types/quiz";
 
 interface ResultsSectionProps {
   results: QuizResult;

@@ -1,7 +1,7 @@
 import React from "react";
 import { QuestionCard } from "./index";
 import { QuizSectionStyles as styles } from "../cssmodules";
-import type { QuizQuestion, QuizResponse } from "../types/quiz";
+import type { QuizResponse } from "../types/quiz";
 
 interface QuizSectionProps {
   quiz: QuizResponse;
