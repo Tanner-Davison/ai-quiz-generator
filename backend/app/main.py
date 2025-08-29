@@ -30,21 +30,21 @@ def create_app() -> FastAPI:
             # Only initialize database if DATABASE_URL is set
             if settings.DATABASE_URL and settings.DATABASE_URL != "postgresql://postgres:password@localhost:5432/quiz_db":
                 await init_db()
-                print("✅ Database initialized successfully")
+                print("Database initialized successfully")
             else:
-                print("⚠️  No database configured - skipping database initialization")
+                print("No database configured - skipping database initialization")
         except Exception as e:
-            print(f"⚠️  Database initialization failed: {e}")
-            print("📝 App will start without database functionality")
+            print(f"Database initialization failed: {e}")
+            print("App will start without database functionality")
     
     @app.on_event("shutdown")
     async def shutdown_event():
         """Close database connections on shutdown"""
         try:
             await close_db()
-            print("🔌 Database connections closed")
+            print("Database connections closed")
         except Exception as e:
-            print(f"⚠️  Error closing database connections: {e}")
+            print(f"Error closing database connections: {e}")
     
     return app
 
@@ -55,6 +55,6 @@ if __name__ == "__main__":
     # Use Railway's PORT environment variable
     port = int(os.getenv("PORT", "3000"))
     host = os.getenv("HOST", "0.0.0.0")
-    print(f"🚀 AI Quiz Generator server running at http://{host}:{port}")
-    print(f"📖 API Documentation: http://{host}:{port}/docs")
+    print(f"AI Quiz Generator server running at http://{host}:{port}")
+    print(f"API Documentation: http://{host}:{port}/docs")
     uvicorn.run(app, host=host, port=port)

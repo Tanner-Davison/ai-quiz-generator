@@ -18,7 +18,6 @@ import type { QuizResponse, QuizResult } from "./types/quiz";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-// Main Quiz Generator Page Component
 const QuizGeneratorPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const [topic, setTopic] = useState("");
@@ -31,7 +30,6 @@ const QuizGeneratorPage: React.FC = () => {
   const [quizHistory, setQuizHistory] = useState<QuizResult[]>([]);
   const [isLoadingQuiz, setIsLoadingQuiz] = useState(false);
 
-  // Check if we have a quiz ID parameter to load
   const quizId = searchParams.get("quiz");
 
   useEffect(() => {
@@ -45,8 +43,6 @@ const QuizGeneratorPage: React.FC = () => {
     setError(null);
 
     try {
-      console.log("🔍 Loading specific quiz:", quizId);
-
       const response = await fetch(`${API_BASE_URL}/quiz/history/${quizId}`);
 
       if (!response.ok) {
@@ -55,9 +51,7 @@ const QuizGeneratorPage: React.FC = () => {
       }
 
       const quizData = await response.json();
-      console.log("✅ Quiz data loaded:", quizData);
 
-      // Convert the database quiz format to our QuizResponse format
       const quizResponse: QuizResponse = {
         topic: quizData.topic,
         questions: quizData.questions.map((q: any) => ({
@@ -74,7 +68,6 @@ const QuizGeneratorPage: React.FC = () => {
       setIsSubmitted(false);
       setResults(null);
     } catch (err) {
-      console.error("💥 Error loading quiz:", err);
       setError(err instanceof Error ? err.message : "Failed to load quiz");
     } finally {
       setIsLoadingQuiz(false);
@@ -83,7 +76,7 @@ const QuizGeneratorPage: React.FC = () => {
 
   const generateQuiz = async () => {
     if (!topic.trim()) {
-      setError("Please enter a topic");
+      setError('Please enter a topic');
       return;
     }
 
@@ -96,23 +89,23 @@ const QuizGeneratorPage: React.FC = () => {
 
     try {
       const response = await fetch(`${API_BASE_URL}/quiz/generate`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({ topic: topic.trim() }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.detail?.error || "Failed to generate quiz");
+        throw new Error(errorData.detail?.error || 'Failed to generate quiz');
       }
 
       const quizData: QuizResponse = await response.json();
       setQuiz(quizData);
       setUserAnswers(new Array(quizData.questions.length).fill(-1));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to generate quiz");
+      setError(err instanceof Error ? err.message : 'Failed to generate quiz');
     } finally {
       setIsGenerating(false);
     }
@@ -126,25 +119,25 @@ const QuizGeneratorPage: React.FC = () => {
 
   const submitQuiz = async () => {
     if (userAnswers.includes(-1)) {
-      setError("Please answer all questions before submitting");
+      setError('Please answer all questions before submitting');
       return;
     }
 
     try {
       const response = await fetch(`${API_BASE_URL}/quiz/submit`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          quiz_id: quiz?.topic || "quiz",
+          quiz_id: quiz?.topic || 'quiz',
           answers: userAnswers,
         }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.detail?.error || "Failed to submit quiz");
+        throw new Error(errorData.detail?.error || 'Failed to submit quiz');
       }
 
       const resultData: QuizResult = await response.json();
@@ -152,19 +145,18 @@ const QuizGeneratorPage: React.FC = () => {
       setIsSubmitted(true);
       setQuizHistory((prev) => [resultData, ...prev]);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to submit quiz");
+      setError(err instanceof Error ? err.message : 'Failed to submit quiz');
     }
   };
 
   const startNewQuiz = () => {
-    setTopic("");
+    setTopic('');
     setQuiz(null);
     setUserAnswers([]);
     setIsSubmitted(false);
     setResults(null);
     setError(null);
-    // Clear the URL parameter
-    window.history.replaceState({}, "", "/");
+    window.history.replaceState({}, '', '/');
   };
 
   return (
@@ -218,8 +210,7 @@ const QuizGeneratorPage: React.FC = () => {
   );
 };
 
-// Main App Component with Router
-function App() {
+const App: React.FC = () => {
   return (
     <Router>
       <div className={styles.app}>
@@ -232,6 +223,6 @@ function App() {
       </div>
     </Router>
   );
-}
+};
 
 export default App;

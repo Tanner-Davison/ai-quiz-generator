@@ -20,24 +20,16 @@ const QuizHistoryPage: React.FC = () => {
     setError(null);
     
     try {
-      console.log('🔍 Fetching quiz history from:', `${API_BASE_URL}/quiz/history`);
-      
       const response = await fetch(`${API_BASE_URL}/quiz/history`);
-      
-      console.log('📡 Response status:', response.status);
-      console.log('📡 Response headers:', response.headers);
       
       if (!response.ok) {
         const errorData = await response.json();
-        console.error('❌ Error response:', errorData);
         throw new Error(errorData.detail?.error || `HTTP ${response.status}: ${response.statusText}`);
       }
       
       const historyData: QuizHistory[] = await response.json();
-      console.log('✅ History data received:', historyData);
       setQuizHistory(historyData);
     } catch (err) {
-      console.error('💥 Fetch error:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch quiz history');
     } finally {
       setIsLoading(false);
@@ -59,7 +51,6 @@ const QuizHistoryPage: React.FC = () => {
   };
 
   const handleTakeQuiz = (quizId: string) => {
-    // Navigate to the main page with the quiz ID to load that specific quiz
     navigate(`/?quiz=${quizId}`);
   };
 
@@ -72,7 +63,7 @@ const QuizHistoryPage: React.FC = () => {
         >
           ← Back to Quiz Generator
         </button>
-        <h1 className={styles.pageTitle}>📚 All Quiz History</h1>
+        <h1 className={styles.pageTitle}>All Quiz History</h1>
         <p className={styles.pageSubtitle}>Click on any quiz to take it again</p>
       </header>
 
