@@ -3,18 +3,36 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from .config import settings
+import os
+
+# Convert DATABASE_URL to async format if needed
+def get_async_database_url():
+    """Convert sync DATABASE_URL to async format"""
+    db_url = settings.DATABASE_URL
+    if db_url.startswith('postgresql://'):
+        # Convert to async format
+        return db_url.replace('postgresql://', 'postgresql+asyncpg://', 1)
+    return db_url
+
+def get_sync_database_url():
+    """Get sync DATABASE_URL"""
+    db_url = settings.DATABASE_URL
+    if db_url.startswith('postgresql+asyncpg://'):
+        # Convert back to sync format
+        return db_url.replace('postgresql+asyncpg://', 'postgresql://', 1)
+    return db_url
 
 # Create async engine for async operations
 async_engine = create_async_engine(
-    settings.DATABASE_URL,
-    echo=True,  # Set to False in production
+    get_async_database_url(),
+    echo=False,  # Set to False in production
     future=True
 )
 
 # Create sync engine for migrations and sync operations
 sync_engine = create_engine(
-    settings.DATABASE_SYNC_URL,
-    echo=True,  # Set to False in production
+    get_sync_database_url(),
+    echo=False,  # Set to False in production
 )
 
 # Create async session factory
