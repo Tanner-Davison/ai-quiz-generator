@@ -14,7 +14,8 @@ async def health_check():
     return {
         "status": "OK",
         "message": "Server is running",
-        "availableModels": list(settings.MODELS.keys()),
+        "environment": settings.ENVIRONMENT,
+        "groq_configured": bool(settings.GROQ_API_KEY)
     }
 
 @router.get("/health/database")
@@ -25,14 +26,22 @@ async def database_health_check(db: AsyncSession = Depends(get_async_db)):
 @router.get("/models")
 async def get_models():
     """Get list of available models"""
+    # Hardcoded models for production
+    available_models = {
+        "llama3-8b-8192": "llama3-8b-8192",
+        "llama3-70b-8192": "llama3-70b-8192",
+        "gemma-7b-it": "gemma-7b-it",
+        "gemma2-9b-it": "gemma2-9b-it"
+    }
+    
     return {
-        "models": settings.MODELS,
-        "recommended": settings.DEFAULT_MODEL,
+        "models": available_models,
+        "recommended": "llama3-8b-8192",
         "description": "All models are free to use with rate limits",
-        "current_default": settings.DEFAULT_MODEL,
+        "current_default": "llama3-8b-8192",
         "model_descriptions": {
             model_id: f"Groq {model_name} model" 
-            for model_name, model_id in settings.MODELS.items()
+            for model_name, model_id in available_models.items()
         }
     }
 
