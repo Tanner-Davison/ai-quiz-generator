@@ -1,0 +1,145 @@
+.quizSection {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.quizHeader {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.quizHeader h3 {
+  color: yellow;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.quizHeader p {
+  color: white;
+  font-size: 1.1rem;
+}
+
+.quizHeader b {
+  color: cyan;
+  font-size: 2rem;
+}
+
+.quizHeader b::before {
+  content: "❮ ";
+  margin-right: 10px;
+}
+.quizHeader b::after {
+  content: "⟵";
+  margin-left: 10px;
+}
+.quizResults {
+  text-align: center;
+}
+
+.quizResultsText {
+  color: #666;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.quizScore {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.scoreValue {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #28a745;
+}
+
+.scoreTotal {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.scorePercentage {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #007bff;
+  background: #f8f9fa;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+}
+
+.questionsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.quizActions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.submitBtn {
+  padding: 0.875rem 2rem;
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.submitBtn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.submitBtn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.newQuizBtn {
+  padding: 0.875rem 2rem;
+  background: linear-gradient(135deg, #6c757d, #495057);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.newQuizBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+}
+
+@media (max-width: 600px) {
+  .quizSection {
+    padding: 1rem;
+  }
+
+  .quizActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .submitBtn,
+  .newQuizBtn {
+    width: 100%;
+  }
+}

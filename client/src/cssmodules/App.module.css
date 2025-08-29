@@ -1,0 +1,114 @@
+/* Global CSS Reset */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
+    "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.app {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+}
+
+.appHeader {
+  text-align: center;
+  padding: 3rem 2rem 2rem;
+  color: white;
+}
+
+.appHeader h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.appHeader p {
+  font-size: 1.2rem;
+  margin: 0;
+  opacity: 0.9;
+  font-weight: 300;
+}
+
+.appMain {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem 2rem;
+}
+
+.appFooter {
+  position: relative;
+  bottom: 0px;
+  color: yellowgreen;
+  text-align: center;
+  padding: 2rem;
+  margin-top: 4rem;
+  a {
+    color: yellow;
+    margin-left: 10px;
+  }
+}
+
+.loadingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.spinner {
+  font-size: 3rem;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.appFooter p {
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .appHeader {
+    padding: 2rem 1rem 1rem;
+  }
+
+  .appHeader h1 {
+    font-size: 2.5rem;
+  }
+
+  .appHeader p {
+    font-size: 1.1rem;
+  }
+
+  .appMain {
+    padding: 0 1rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .appHeader h1 {
+    font-size: 2rem;
+  }
+
+  .appHeader p {
+    font-size: 1rem;
+  }
+}
