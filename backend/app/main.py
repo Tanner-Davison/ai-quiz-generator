@@ -52,7 +52,9 @@ app = create_app()
 
 if __name__ == "__main__":
     import uvicorn
-    port = settings.PORT
-    print(f"🚀 AI Quiz Generator server running at http://localhost:{port}")
-    print(f" API Documentation: http://localhost:{port}/docs")
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    # Use Railway's PORT environment variable
+    port = int(os.getenv("PORT", "3000"))
+    host = os.getenv("HOST", "0.0.0.0")
+    print(f"🚀 AI Quiz Generator server running at http://{host}:{port}")
+    print(f"📖 API Documentation: http://{host}:{port}/docs")
+    uvicorn.run(app, host=host, port=port)
