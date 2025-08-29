@@ -4,6 +4,7 @@ from .middleware.logging import add_logging_middleware
 from .routes import quiz, health
 from .config import settings
 from .database import init_db, close_db
+import os
 
 def create_app() -> FastAPI:
     """Create and configure the FastAPI application"""
@@ -25,14 +26,25 @@ def create_app() -> FastAPI:
     @app.on_event("startup")
     async def startup_event():
         """Initialize database on startup"""
-        await init_db()
-        print("✅ Database initialized successfully")
+        try:
+            # Only initialize database if DATABASE_URL is set
+            if settings.DATABASE_URL and settings.DATABASE_URL != "postgresql://postgres:password@localhost:5432/quiz_db":
+                await init_db()
+                print("✅ Database initialized successfully")
+            else:
+                print("⚠️  No database configured - skipping database initialization")
+        except Exception as e:
+            print(f"⚠️  Database initialization failed: {e}")
+            print("📝 App will start without database functionality")
     
     @app.on_event("shutdown")
     async def shutdown_event():
         """Close database connections on shutdown"""
-        await close_db()
-        print("🔌 Database connections closed")
+        try:
+            await close_db()
+            print("🔌 Database connections closed")
+        except Exception as e:
+            print(f"⚠️  Error closing database connections: {e}")
     
     return app
 
