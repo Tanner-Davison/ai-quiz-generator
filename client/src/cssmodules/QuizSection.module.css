@@ -30,10 +30,6 @@
   content: "❮ ";
   margin-right: 10px;
 }
-.quizHeader b::after {
-  content: "⟵";
-  margin-left: 10px;
-}
 .quizResults {
   text-align: center;
 }
