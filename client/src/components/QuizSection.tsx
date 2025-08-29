@@ -22,17 +22,11 @@ const QuizSection: React.FC<QuizSectionProps> = ({
   showResults = false,
   isSubmitted = false,
 }) => {
-  // function capitalizeFirstLetter(str) {
-  //   if (str.length === 0) {
-  //     return "";
-  //   }
-  //   return str.charAt(0).toUpperCase() + str.slice(1);
-  // }
   return (
     <div className={styles.quizSection}>
       <div className={styles.quizHeader}>
         <h3>
-          Quiz Topic:{" "}
+          Generated Quiz Topic:{" "}
           <b>{quiz.topic.charAt(0).toUpperCase() + quiz.topic.slice(1)}</b>
         </h3>
         {!showResults ? (

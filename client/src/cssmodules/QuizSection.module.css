@@ -5,12 +5,14 @@
 }
 
 .quizHeader {
+  display: flex;
+  flex-direction: column;
   text-align: center;
   margin-bottom: 2rem;
 }
 
 .quizHeader h3 {
-  color: yellow;
+  color: white;
   font-size: 2rem;
   margin-bottom: 0.5rem;
   font-weight: 600;
@@ -22,14 +24,10 @@
 }
 
 .quizHeader b {
-  color: cyan;
+  color: limegreen;
   font-size: 2rem;
 }
 
-.quizHeader b::before {
-  content: "❮ ";
-  margin-right: 10px;
-}
 .quizResults {
   text-align: center;
 }
