@@ -63,13 +63,13 @@ The correct_answer should be the index (0-3) of the correct option."""
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are an expert educator. Respond with ONLY valid JSON.",
+                        "content": "You are a JSON generator. You must respond with ONLY valid, complete JSON. Never include explanatory text, markdown formatting, or any content outside the JSON object. Ensure all JSON syntax is correct with proper quotes, commas, and brackets.",
                     },
                     {"role": "user", "content": prompt},
                 ],
                 model=request.model,
-                temperature=request.temperature or 0.2,
-                max_tokens=1024,
+                temperature=request.temperature or 0.1,
+                max_tokens=1500,
             )
 
             print(f"DEBUG: Got completion response")
