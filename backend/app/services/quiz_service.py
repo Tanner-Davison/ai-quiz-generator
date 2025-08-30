@@ -24,6 +24,15 @@ def extract_json_from_response(response_text):
 class QuizService:
     def __init__(self):
         self.ai_service = ai_service
+        self.inappropriate_topics = {
+            "vagina", "nipple", "sphincter", "feces", "penis", "breast", 
+            "sexual", "porn", "nude", "explicit", "nsfw", "adult"
+        }
+    
+    def is_topic_appropriate(self, topic: str) -> bool:
+        """Check if a topic is appropriate for quiz generation"""
+        topic_lower = topic.lower()
+        return not any(inappropriate in topic_lower for inappropriate in self.inappropriate_topics)
     
     def generate_quiz_prompt(self, topic: str) -> str:
         """Generate a basic prompt for quiz creation"""
@@ -51,6 +60,10 @@ The correct_answer should be the index (0-3) of the correct option."""
         try:
             if not request.topic:
                 raise ValueError("Topic is required")
+            
+            # Check if topic is appropriate
+            if not self.is_topic_appropriate(request.topic):
+                raise ValueError("This topic is not appropriate for quiz generation. Please choose a different topic.")
 
             print(f"DEBUG: Starting quiz generation for topic: {request.topic}")
             logger.info(f"Generating quiz for topic: {request.topic}")
