@@ -93,6 +93,9 @@ async def generate_quiz(request: QuizRequest, force_model: str = None, db: Async
         # Store the current quiz for submission
         current_quiz = result
         
+        # Add the quiz ID to the result
+        result.quiz_id = saved_quiz.id
+        
         print("🔍 DEBUG: About to return result...")
         return result
     except ValueError as e:
@@ -117,19 +120,25 @@ async def generate_quiz(request: QuizRequest, force_model: str = None, db: Async
         )
 
 @router.post("/submit", response_model=QuizResult)
-async def submit_quiz(submission: QuizSubmission):
+async def submit_quiz(submission: QuizSubmission, db: AsyncSession = Depends(get_async_db)):
     """Submit quiz answers and get results"""
-    global current_quiz
     
     try:
-        if not current_quiz:
-            raise HTTPException(status_code=400, detail="No quiz available. Please generate a quiz first.")
+        # Retrieve quiz from database
+        quiz = await quiz_db_service.get_by_id(db, submission.quiz_id)
+        if not quiz:
+            raise HTTPException(status_code=400, detail="Quiz not found. Please generate a quiz first.")
         
-        if len(submission.answers) != len(current_quiz.questions):
-            raise HTTPException(status_code=400, detail=f"Must submit exactly {len(current_quiz.questions)} answers")
+        # Get questions for this quiz
+        questions = await question_db_service.get_by_quiz_id(db, submission.quiz_id)
+        if not questions:
+            raise HTTPException(status_code=400, detail="Quiz questions not found.")
+        
+        if len(submission.answers) != len(questions):
+            raise HTTPException(status_code=400, detail=f"Must submit exactly {len(questions)} answers")
 
-        # Get correct answers from the actual quiz
-        correct_answers = [q.correct_answer for q in current_quiz.questions]
+        # Get correct answers from the database
+        correct_answers = [q.correct_answer for q in questions]
         
         # Calculate score
         score = sum(
@@ -143,7 +152,7 @@ async def submit_quiz(submission: QuizSubmission):
         for i, (user_ans, correct_ans) in enumerate(
             zip(submission.answers, correct_answers)
         ):
-            question = current_quiz.questions[i]
+            question = questions[i]
             if user_ans == correct_ans:
                 feedback.append(f"Question {i+1}: Correct! {question.explanation}")
             else:
@@ -154,12 +163,12 @@ async def submit_quiz(submission: QuizSubmission):
 
         result = QuizResult(
             quiz_id=submission.quiz_id,
-            topic=current_quiz.topic,
+            topic=quiz.topic,
             user_answers=submission.answers,
             correct_answers=correct_answers,
             score=score,
-            total_questions=len(current_quiz.questions),
-            percentage=(score / len(current_quiz.questions)) * 100,
+            total_questions=len(questions),
+            percentage=(score / len(questions)) * 100,
             submitted_at=datetime.now().isoformat(),
             feedback=feedback,
         )

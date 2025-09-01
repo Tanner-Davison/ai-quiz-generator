@@ -144,7 +144,7 @@ const QuizGeneratorPage: React.FC = () => {
 
     try {
       const submissionData = {
-        quiz_id: quiz.topic,
+        quiz_id: quiz.quiz_id || quiz.topic, // Use quiz_id if available, fallback to topic
         answers: userAnswers,
       };
       

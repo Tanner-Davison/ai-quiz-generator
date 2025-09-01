@@ -6,6 +6,7 @@ export interface QuizQuestion {
 }
 
 export interface QuizResponse {
+  quiz_id?: string;
   topic: string;
   questions: QuizQuestion[];
   generated_at: string;

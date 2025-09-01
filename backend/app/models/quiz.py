@@ -14,6 +14,7 @@ class QuizQuestion(BaseModel):
     explanation: str
 
 class QuizResponse(BaseModel):
+    quiz_id: Optional[str] = None
     topic: str
     questions: List[QuizQuestion]
     generated_at: str
