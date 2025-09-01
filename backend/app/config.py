@@ -28,7 +28,7 @@ class Settings:
             ]
         else:
             ALLOWED_ORIGINS: List[str] = [
-                "https://your-frontend-domain.vercel.app"
+                "https://ai-quiz-creator.vercel.app"
             ]
     
     # API Keys
