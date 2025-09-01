@@ -65,6 +65,7 @@ const QuizGeneratorPage: React.FC = () => {
       const quizData = await response.json();
 
       const quizResponse: QuizResponse = {
+        quiz_id: quizData.id, // Include the quiz_id from the loaded quiz
         topic: quizData.topic,
         questions: quizData.questions.map((q: any) => ({
           question: q.question,
