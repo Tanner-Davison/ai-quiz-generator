@@ -28,7 +28,7 @@ MODELS = {
 }
 
 # Default model
-DEFAULT_MODEL = MODELS["LLAMA3_70B"]
+DEFAULT_MODEL = MODELS["GEMMA_7B"]
 
 # In-memory storage for quiz results (in production, use a database)
 quiz_results = []
