@@ -23,8 +23,8 @@ const HistorySection: React.FC<HistorySectionProps> = ({ quizHistory }) => {
   return (
     <div className={styles.historySection}>
       <div className={styles.historyHeader}>
-        <h3 className={styles.historyTitle}>Latest Quiz</h3>
-        <p className={styles.historySubtitle}>Your recent quiz attempts</p>
+        <h3 className={styles.historyTitle}>Previous Quiz</h3>
+        <p className={styles.historySubtitle}>Your recent quiz attempt</p>
       </div>
       <ul className={styles.historyList}>
         {quizHistory.slice(0, 5).map((result, index) => (
