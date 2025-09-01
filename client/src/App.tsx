@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -32,14 +32,7 @@ const QuizGeneratorPage: React.FC = () => {
 
   const quizId = searchParams.get("quiz");
 
-  useEffect(() => {
-    if (quizId) {
-      loadSpecificQuiz(quizId);
-    }
-    // Don't reset to main page automatically - let user control this
-  }, [quizId]);
-
-  const resetToMainPage = () => {
+  const resetToMainPage = useCallback(() => {
     setTopic("");
     setIsGenerating(false);
     setQuiz(null);
@@ -48,7 +41,27 @@ const QuizGeneratorPage: React.FC = () => {
     setResults(null);
     setError(null);
     setIsLoadingQuiz(false);
-  };
+  }, []);
+
+  useEffect(() => {
+    if (quizId) {
+      loadSpecificQuiz(quizId);
+    }
+    // Don't reset to main page automatically - let user control this
+  }, [quizId]);
+
+  useEffect(() => {
+    // Listen for the resetQuiz custom event
+    const handleResetQuiz = () => {
+      resetToMainPage();
+    };
+
+    window.addEventListener('resetQuiz', handleResetQuiz);
+    
+    return () => {
+      window.removeEventListener('resetQuiz', handleResetQuiz);
+    };
+  }, [resetToMainPage]);
 
   const loadSpecificQuiz = async (quizId: string) => {
     setIsLoadingQuiz(true);
