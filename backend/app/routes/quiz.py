@@ -132,12 +132,12 @@ async def submit_quiz(submission: QuizSubmission, db: AsyncSession = Depends(get
     
     try:
         # Try to retrieve quiz from database first
-        quiz = await quiz_db_service.get_by_id(db, submission.quiz_id)
+        quiz = await quiz_db_service.get(db, submission.quiz_id)
         questions = None
         
         if quiz:
             # Get questions for this quiz from database
-            questions = await question_db_service.get_by_quiz_id(db, submission.quiz_id)
+            questions = await question_db_service.get_by_quiz(db, submission.quiz_id)
         
         # If not found in database, try to use the current quiz (fallback for in-memory storage)
         if not quiz or not questions:
