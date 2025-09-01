@@ -22,6 +22,14 @@ const QuizSection: React.FC<QuizSectionProps> = ({
   showResults = false,
   isSubmitted = false,
 }) => {
+  // Debug logging
+  console.log('QuizSection render:', {
+    isSubmitted,
+    userAnswers,
+    hasUnanswered: userAnswers.includes(-1),
+    quizQuestions: quiz.questions.length
+  });
+
   return (
     <div className={styles.quizSection}>
       <div className={styles.quizHeader}>

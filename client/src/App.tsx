@@ -130,6 +130,13 @@ const QuizGeneratorPage: React.FC = () => {
   };
 
   const submitQuiz = async () => {
+    console.log('submitQuiz called:', {
+      hasQuiz: !!quiz,
+      userAnswers,
+      hasUnanswered: userAnswers.includes(-1),
+      isSubmitted
+    });
+
     if (!quiz) {
       setError('No quiz loaded. Please generate a quiz first.');
       return;
