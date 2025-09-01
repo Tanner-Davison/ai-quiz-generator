@@ -1,7 +1,6 @@
 # Development startup script for AI Quiz Generator (Windows PowerShell)
 Write-Host "🚀 Starting AI Quiz Generator in development mode..." -ForegroundColor Green
 
-# Check if we're in the right directory
 if (-not (Test-Path "start-dev.ps1")) {
     Write-Host "❌ Please run this script from the project root directory" -ForegroundColor Red
     exit 1
