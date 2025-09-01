@@ -35,8 +35,22 @@ const QuizGeneratorPage: React.FC = () => {
   useEffect(() => {
     if (quizId) {
       loadSpecificQuiz(quizId);
+    } else {
+      // Reset to main page state when no quiz ID is present
+      resetToMainPage();
     }
   }, [quizId]);
+
+  const resetToMainPage = () => {
+    setTopic("");
+    setIsGenerating(false);
+    setQuiz(null);
+    setUserAnswers([]);
+    setIsSubmitted(false);
+    setResults(null);
+    setError(null);
+    setIsLoadingQuiz(false);
+  };
 
   const loadSpecificQuiz = async (quizId: string) => {
     setIsLoadingQuiz(true);
@@ -150,12 +164,7 @@ const QuizGeneratorPage: React.FC = () => {
   };
 
   const startNewQuiz = () => {
-    setTopic('');
-    setQuiz(null);
-    setUserAnswers([]);
-    setIsSubmitted(false);
-    setResults(null);
-    setError(null);
+    resetToMainPage();
     window.history.replaceState({}, '', '/');
   };
 
