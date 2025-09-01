@@ -35,10 +35,8 @@ const QuizGeneratorPage: React.FC = () => {
   useEffect(() => {
     if (quizId) {
       loadSpecificQuiz(quizId);
-    } else {
-      // Reset to main page state when no quiz ID is present
-      resetToMainPage();
     }
+    // Don't reset to main page automatically - let user control this
   }, [quizId]);
 
   const resetToMainPage = () => {
