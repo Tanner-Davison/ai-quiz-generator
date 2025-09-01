@@ -26,19 +26,21 @@ async def database_health_check(db: AsyncSession = Depends(get_async_db)):
 @router.get("/models")
 async def get_models():
     """Get list of available models"""
-    # Hardcoded models for production
+    # Updated models for current availability
     available_models = {
-        "llama3-8b-8192": "llama3-8b-8192",
+        "llama-3.1-8b-instant": "llama-3.1-8b-instant",
+        "llama-3.1-70b-versatile": "llama-3.1-70b-versatile",
         "llama3-70b-8192": "llama3-70b-8192",
+        "mixtral-8x7b-32768": "mixtral-8x7b-32768",
         "gemma-7b-it": "gemma-7b-it",
         "gemma2-9b-it": "gemma2-9b-it"
     }
     
     return {
         "models": available_models,
-        "recommended": "llama3-8b-8192",
+        "recommended": "llama-3.1-8b-instant",
         "description": "All models are free to use with rate limits",
-        "current_default": "llama3-8b-8192",
+        "current_default": "llama-3.1-8b-instant",
         "model_descriptions": {
             model_id: f"Groq {model_name} model" 
             for model_name, model_id in available_models.items()

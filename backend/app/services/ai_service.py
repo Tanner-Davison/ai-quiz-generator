@@ -6,12 +6,14 @@ from ..config import settings
 class AIService:
     def __init__(self):
         self.client = Groq(api_key=settings.GROQ_API_KEY)
-        self.default_model = "llama3-8b-8192"
+        self.default_model = "llama-3.1-8b-instant"
     
     def get_model(self, requested_model: str = None) -> str:
         available_models = {
-            "llama3-8b-8192": "llama3-8b-8192",
+            "llama-3.1-8b-instant": "llama-3.1-8b-instant",
+            "llama-3.1-70b-versatile": "llama-3.1-70b-versatile",
             "llama3-70b-8192": "llama3-70b-8192",
+            "mixtral-8x7b-32768": "mixtral-8x7b-32768",
             "gemma-7b-it": "gemma-7b-it",
             "gemma2-9b-it": "gemma2-9b-it"
         }

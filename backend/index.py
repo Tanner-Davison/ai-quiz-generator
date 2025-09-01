@@ -18,17 +18,18 @@ load_dotenv()
 # Initialize Groq client
 groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-# Available models on Groq
+# Available models on Groq (updated for current availability)
 MODELS = {
     "LLAMA3_70B": "llama3-70b-8192",
-    "LLAMA3_8B": "llama3-8b-8192",
     "MIXTRAL": "mixtral-8x7b-32768",
     "GEMMA_7B": "gemma-7b-it",
     "GEMMA2_9B": "gemma2-9b-it",
+    "LLAMA3_1_8B": "llama-3.1-8b-instant",
+    "LLAMA3_1_70B": "llama-3.1-70b-versatile",
 }
 
-# Default model
-DEFAULT_MODEL = MODELS["GEMMA_7B"]
+# Default model - using a currently supported model
+DEFAULT_MODEL = MODELS["LLAMA3_1_8B"]
 
 # In-memory storage for quiz results (in production, use a database)
 quiz_results = []

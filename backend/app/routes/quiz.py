@@ -55,7 +55,7 @@ async def generate_quiz(request: QuizRequest, force_model: str = None, db: Async
             # Save the quiz
             quiz_data = {
                 "topic": result.topic,
-                "model": request.model or "llama3-8b-8192",
+                "model": request.model or "llama-3.1-8b-instant",
                 "temperature": request.temperature or 0.2
             }
             print(f"📝 Quiz data to save: {quiz_data}")
