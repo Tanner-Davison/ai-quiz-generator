@@ -18,7 +18,7 @@ from app.database import close_db, init_db
 async def main():
     """Initialize the database"""
     print("🚀 Initializing AI Quiz Generator Database...")
-    print(f"📊 Database URL: {settings.DATABASE_URL}")
+    print(f"📊 Database URL: {'***' if settings.DATABASE_URL else 'None'}")
 
     try:
         # Initialize database (create tables)

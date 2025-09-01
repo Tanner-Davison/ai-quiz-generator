@@ -60,7 +60,7 @@ def get_sync_db():
 
 async def init_db():
     async with async_engine.begin() as conn:
-        from .models.database_models import Quiz, QuizQuestion, QuizSubmission, QuizAnswer, ChatSession, ChatMessage
+        from .models.database_models import Quiz, QuizQuestion, QuizSubmission
         await conn.run_sync(Base.metadata.create_all)
 
 async def close_db():

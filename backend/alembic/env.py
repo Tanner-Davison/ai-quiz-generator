@@ -4,16 +4,25 @@ from sqlalchemy import pool
 from alembic import context
 import os
 import sys
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Add the app directory to the Python path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'app'))
 
 from database import Base
-from models.database_models import Quiz, QuizQuestion, QuizSubmission, QuizAnswer, ChatSession, ChatMessage
+from models.database_models import Quiz, QuizQuestion, QuizSubmission
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
+
+# Override sqlalchemy.url with environment variable if available
+database_url = os.getenv("DATABASE_URL")
+if database_url:
+    config.set_main_option("sqlalchemy.url", database_url)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

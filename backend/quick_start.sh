@@ -14,26 +14,25 @@ if [ ! -f .env ]; then
     echo "📝 Creating .env file..."
     cat > .env << EOF
 # API Configuration
-PORT=3000
+PORT=8000
 HOST=0.0.0.0
 
 # Groq Configuration
 GROQ_API_KEY=your_groq_api_key_here
 
 # Database Configuration
-DATABASE_URL=postgresql+asyncpg://postgres:password@localhost:5433/ai_quiz_db
-DATABASE_SYNC_URL=postgresql://postgres:password@localhost:5433/ai_quiz_db
+DATABASE_URL=postgresql://postgres:password@localhost:5433/ai_quiz_db
 
-# AI Service Configuration
-DEFAULT_TEMPERATURE=0.7
-DEFAULT_MAX_TOKENS=1024
-DEFAULT_QUIZ_MAX_TOKENS=1024
-
-# Wikipedia Service Configuration
-MAX_WIKIPEDIA_SUMMARY_LENGTH=1000
+# Environment
+ENVIRONMENT=development
+DEBUG=true
 
 # CORS Configuration
-ALLOWED_ORIGINS=["*"]
+ALLOWED_ORIGINS=http://localhost:3000,http://localhost:5173,http://localhost:4173,http://localhost:8080
+
+# Development-specific settings
+SKIP_DB_INIT=false
+LOG_LEVEL=DEBUG
 EOF
     echo "✅ .env file created. Please update GROQ_API_KEY with your actual key."
 else
