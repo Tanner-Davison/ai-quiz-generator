@@ -132,6 +132,7 @@ const QuizGeneratorPage: React.FC = () => {
   const submitQuiz = async () => {
     console.log('submitQuiz called:', {
       hasQuiz: !!quiz,
+      quizId: quiz?.quiz_id,
       userAnswers,
       hasUnanswered: userAnswers.includes(-1),
       isSubmitted
@@ -147,13 +148,19 @@ const QuizGeneratorPage: React.FC = () => {
       return;
     }
 
+    if (!quiz.quiz_id) {
+      setError('Quiz ID is missing. Please generate a new quiz.');
+      return;
+    }
+
     try {
       const submissionData = {
-        quiz_id: quiz.quiz_id || quiz.topic, // Use quiz_id if available, fallback to topic
+        quiz_id: quiz.quiz_id,
         answers: userAnswers,
       };
       
       console.log('Submitting quiz:', submissionData);
+      console.log('API URL:', `${API_BASE_URL}/quiz/submit`);
       
       const response = await fetch(`${API_BASE_URL}/quiz/submit`, {
         method: 'POST',
@@ -163,16 +170,22 @@ const QuizGeneratorPage: React.FC = () => {
         body: JSON.stringify(submissionData),
       });
 
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.detail?.error || 'Failed to submit quiz');
+        console.error('Error response:', errorData);
+        throw new Error(errorData.detail?.error || errorData.detail || 'Failed to submit quiz');
       }
 
       const resultData: QuizResult = await response.json();
+      console.log('Quiz result received:', resultData);
       setResults(resultData);
       setIsSubmitted(true);
       setQuizHistory((prev) => [resultData, ...prev]);
     } catch (err) {
+      console.error('Submit quiz error:', err);
       setError(err instanceof Error ? err.message : 'Failed to submit quiz');
     }
   };

@@ -79,7 +79,7 @@ async def generate_quiz(request: QuizRequest, force_model: str = None, db: Async
                 print(f"✅ Question {i+1} saved with ID: {saved_question.id}")
             
             # Update the result with the database ID
-            # result.quiz_id = saved_quiz.id  # This line causes an error
+            result.quiz_id = saved_quiz.id
             print(f"🔄 Quiz saved with database ID: {saved_quiz.id}")
             
         except Exception as db_error:
@@ -89,12 +89,19 @@ async def generate_quiz(request: QuizRequest, force_model: str = None, db: Async
             import traceback
             print(f"❌ Full traceback: {traceback.format_exc()}")
             # Continue without database save for now
+            saved_quiz = None
         
         # Store the current quiz for submission
         current_quiz = result
         
-        # Add the quiz ID to the result
-        result.quiz_id = saved_quiz.id
+        # Add the quiz ID to the result (use saved quiz ID or generate a fallback)
+        if saved_quiz:
+            result.quiz_id = saved_quiz.id
+        else:
+            # Generate a fallback ID for in-memory storage
+            import uuid
+            result.quiz_id = str(uuid.uuid4())
+            print(f"🔄 Using fallback quiz ID: {result.quiz_id}")
         
         print("🔍 DEBUG: About to return result...")
         return result
@@ -124,21 +131,36 @@ async def submit_quiz(submission: QuizSubmission, db: AsyncSession = Depends(get
     """Submit quiz answers and get results"""
     
     try:
-        # Retrieve quiz from database
+        # Try to retrieve quiz from database first
         quiz = await quiz_db_service.get_by_id(db, submission.quiz_id)
-        if not quiz:
-            raise HTTPException(status_code=400, detail="Quiz not found. Please generate a quiz first.")
+        questions = None
         
-        # Get questions for this quiz
-        questions = await question_db_service.get_by_quiz_id(db, submission.quiz_id)
-        if not questions:
-            raise HTTPException(status_code=400, detail="Quiz questions not found.")
+        if quiz:
+            # Get questions for this quiz from database
+            questions = await question_db_service.get_by_quiz_id(db, submission.quiz_id)
+        
+        # If not found in database, try to use the current quiz (fallback for in-memory storage)
+        if not quiz or not questions:
+            if current_quiz and current_quiz.quiz_id == submission.quiz_id:
+                quiz = type('Quiz', (), {
+                    'id': current_quiz.quiz_id,
+                    'topic': current_quiz.topic
+                })()
+                questions = current_quiz.questions
+                print(f"🔄 Using current quiz from memory for submission: {submission.quiz_id}")
+            else:
+                raise HTTPException(status_code=400, detail="Quiz not found. Please generate a quiz first.")
         
         if len(submission.answers) != len(questions):
             raise HTTPException(status_code=400, detail=f"Must submit exactly {len(questions)} answers")
 
-        # Get correct answers from the database
-        correct_answers = [q.correct_answer for q in questions]
+        # Get correct answers
+        if hasattr(questions[0], 'correct_answer'):
+            # Database questions
+            correct_answers = [q.correct_answer for q in questions]
+        else:
+            # In-memory questions (QuizQuestion objects)
+            correct_answers = [q.correct_answer for q in questions]
         
         # Calculate score
         score = sum(
@@ -153,12 +175,15 @@ async def submit_quiz(submission: QuizSubmission, db: AsyncSession = Depends(get
             zip(submission.answers, correct_answers)
         ):
             question = questions[i]
+            # Handle both database and in-memory question objects
+            explanation = getattr(question, 'explanation', 'No explanation available.')
+            
             if user_ans == correct_ans:
-                feedback.append(f"Question {i+1}: Correct! {question.explanation}")
+                feedback.append(f"Question {i+1}: Correct! {explanation}")
             else:
                 correct_option = chr(65 + correct_ans)  # Convert 0-3 to A-D
                 feedback.append(
-                    f"Question {i+1}: Incorrect. The correct answer was option {correct_option}. {question.explanation}"
+                    f"Question {i+1}: Incorrect. The correct answer was option {correct_option}. {explanation}"
                 )
 
         result = QuizResult(
