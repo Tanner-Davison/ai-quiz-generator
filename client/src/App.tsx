@@ -132,21 +132,30 @@ const QuizGeneratorPage: React.FC = () => {
   };
 
   const submitQuiz = async () => {
+    if (!quiz) {
+      setError('No quiz loaded. Please generate a quiz first.');
+      return;
+    }
+
     if (userAnswers.includes(-1)) {
       setError('Please answer all questions before submitting');
       return;
     }
 
     try {
+      const submissionData = {
+        quiz_id: quiz.topic,
+        answers: userAnswers,
+      };
+      
+      console.log('Submitting quiz:', submissionData);
+      
       const response = await fetch(`${API_BASE_URL}/quiz/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          quiz_id: quiz?.topic || 'quiz',
-          answers: userAnswers,
-        }),
+        body: JSON.stringify(submissionData),
       });
 
       if (!response.ok) {
