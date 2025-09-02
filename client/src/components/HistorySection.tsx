@@ -9,28 +9,8 @@ interface HistorySectionProps {
 }
 
 const HistorySection: React.FC<HistorySectionProps> = ({ quizHistory }) => {
-  // Add a test enhanced quiz for debugging
-  const testEnhancedQuiz: QuizResult = {
-    quiz_id: 'test-enhanced',
-    topic: 'Test Enhanced Quiz',
-    user_answers: [0, 1, 2, 3, 4],
-    correct_answers: [0, 1, 2, 3, 4],
-    score: 5,
-    total_questions: 5,
-    percentage: 100,
-    submitted_at: new Date().toISOString(),
-    feedback: ['Correct!', 'Correct!', 'Correct!', 'Correct!', 'Correct!'],
-    wikipediaEnhanced: true,
-    average_score: 95.5,
-    total_attempts: 3
-  };
 
-  const displayHistory = [...quizHistory];
   if (quizHistory.length === 0) {
-    displayHistory.push(testEnhancedQuiz);
-  }
-
-  if (displayHistory.length === 0) {
     return (
       <div className={styles.historySection}>
         <div className={styles.emptyHistory}>
@@ -46,11 +26,11 @@ const HistorySection: React.FC<HistorySectionProps> = ({ quizHistory }) => {
   return (
     <div className={styles.historySection}>
       <div className={styles.historyHeader}>
-        <h3 className={styles.historyTitle}>Previous Quiz</h3>
-        <p className={styles.historySubtitle}>Your recent quiz attempt</p>
+        <h3 className={styles.historyTitle}>Recent Quiz History</h3>
+        <p className={styles.historySubtitle}>Your latest quiz attempts</p>
       </div>
       <ul className={styles.historyList}>
-        {displayHistory.slice(0, 5).map((result, index) => (
+        {quizHistory.slice(0, 5).map((result, index) => (
           <li key={index} className={styles.historyItem}>
             <div className={styles.historyItemHeader}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
