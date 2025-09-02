@@ -3,7 +3,7 @@
  * Handles calculation and storage of quiz scores and averages
  */
 
-import type { QuizResult } from '../types/quiz';
+
 
 export interface ScoreStats {
   averageScore: number;

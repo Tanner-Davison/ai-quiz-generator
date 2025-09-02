@@ -2,7 +2,7 @@ import React from "react";
 import { HistorySectionStyles as styles } from "../cssmodules";
 import type { QuizResult } from "../types/quiz";
 import WikipediaEnhancementBadge from "./WikipediaEnhancementBadge";
-import { scoreService } from "../services/scoreService";
+
 
 interface HistorySectionProps {
   quizHistory: QuizResult[];
