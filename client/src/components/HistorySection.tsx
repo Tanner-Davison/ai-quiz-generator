@@ -44,7 +44,7 @@ const HistorySection: React.FC<HistorySectionProps> = ({ quizHistory }) => {
                   {result.score}/{result.total_questions}
                 </span>
                 <span className={styles.percentageBadge}>
-                  {result.percentage.toFixed(0)}%
+                  {result.percentage ? result.percentage.toFixed(0) : 0}%
                 </span>
               </div>
             </div>
@@ -60,12 +60,12 @@ const HistorySection: React.FC<HistorySectionProps> = ({ quizHistory }) => {
                   fontSize: '12px',
                   color: '#6b7280'
                 }}>
-                  {result.average_score !== undefined && (
+                  {result.average_score !== undefined && result.average_score !== null && (
                     <span>
                       📊 Avg: {result.average_score.toFixed(1)}%
                     </span>
                   )}
-                  {result.total_attempts !== undefined && (
+                  {result.total_attempts !== undefined && result.total_attempts !== null && (
                     <span>
                       🔄 Attempts: {result.total_attempts}
                     </span>

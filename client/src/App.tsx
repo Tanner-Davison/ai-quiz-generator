@@ -14,11 +14,12 @@ import {
   NavigationHeader,
   QuizHistoryPage,
 } from "./components";
+
 import type { QuizResponse, QuizResult } from "./types/quiz";
 import { enhancedQuizService } from "./services/enhancedQuizService";
 import { scoreService } from "./services/scoreService";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 const QuizGeneratorPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -48,6 +49,9 @@ const QuizGeneratorPage: React.FC = () => {
   useEffect(() => {
     if (quizId) {
       loadSpecificQuiz(quizId);
+    } else {
+      // Load quiz history when app starts (no specific quiz ID)
+      loadQuizHistory();
     }
     // Don't reset to main page automatically - let user control this
   }, [quizId]);
@@ -58,12 +62,49 @@ const QuizGeneratorPage: React.FC = () => {
       resetToMainPage();
     };
 
-    window.addEventListener("resetQuiz", handleResetQuiz);
-
+    window.addEventListener('resetQuiz', handleResetQuiz);
+    
     return () => {
-      window.removeEventListener("resetQuiz", handleResetQuiz);
+      window.removeEventListener('resetQuiz', handleResetQuiz);
     };
   }, [resetToMainPage]);
+
+  const loadQuizHistory = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/quiz/history`);
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail?.error || 'Failed to load quiz history');
+      }
+      
+      const historyData = await response.json();
+      console.log('Loaded quiz history:', historyData);
+      console.log('Wikipedia enhanced flags in history:', historyData.map((quiz: any) => ({ id: quiz.id, topic: quiz.topic, wikipediaEnhanced: quiz.wikipediaEnhanced })));
+      
+      // Convert QuizHistory to QuizResult format for display
+      const quizResults = historyData.map((quiz: any) => ({
+        quiz_id: quiz.id,
+        topic: quiz.topic,
+        user_answers: [],
+        correct_answers: [],
+        score: 0,
+        total_questions: quiz.question_count,
+        percentage: 0,
+        submitted_at: quiz.created_at,
+        feedback: [],
+        wikipediaEnhanced: quiz.wikipediaEnhanced || false,
+        average_score: quiz.average_score,
+        total_attempts: quiz.submission_count
+      }));
+      
+      console.log('Converted history with wikipediaEnhanced flags:', quizResults.map(quiz => ({ id: quiz.quiz_id, topic: quiz.topic, wikipediaEnhanced: quiz.wikipediaEnhanced })));
+      setQuizHistory(quizResults);
+    } catch (error) {
+      console.error('Error loading quiz history:', error);
+      // Don't set error state for history loading failures
+    }
+  };
 
   const loadSpecificQuiz = async (quizId: string) => {
     setIsLoadingQuiz(true);
@@ -104,7 +145,7 @@ const QuizGeneratorPage: React.FC = () => {
 
   const generateQuiz = async () => {
     if (!topic.trim()) {
-      setError("Please enter a topic");
+      setError('Please enter a topic');
       return;
     }
 
@@ -117,26 +158,26 @@ const QuizGeneratorPage: React.FC = () => {
 
     try {
       const response = await fetch(`${API_BASE_URL}/quiz/generate`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
+        body: JSON.stringify({ 
           topic: topic.trim(),
-          wikipediaEnhanced: false, // Regular quiz, not enhanced
+          wikipediaEnhanced: false // Regular quiz, not enhanced
         }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.detail?.error || "Failed to generate quiz");
+        throw new Error(errorData.detail?.error || 'Failed to generate quiz');
       }
 
       const quizData: QuizResponse = await response.json();
       setQuiz(quizData);
       setUserAnswers(new Array(quizData.questions.length).fill(-1));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to generate quiz");
+      setError(err instanceof Error ? err.message : 'Failed to generate quiz');
     } finally {
       setIsGenerating(false);
     }
@@ -144,7 +185,7 @@ const QuizGeneratorPage: React.FC = () => {
 
   const generateEnhancedQuiz = async () => {
     if (!topic.trim()) {
-      setError("Please enter a topic");
+      setError('Please enter a topic');
       return;
     }
 
@@ -156,16 +197,13 @@ const QuizGeneratorPage: React.FC = () => {
     setResults(null);
 
     try {
-      const quizData: QuizResponse =
-        await enhancedQuizService.generateEnhancedQuiz(topic.trim());
-      console.log("Enhanced quiz data received:", quizData);
-      console.log("Wikipedia context:", quizData.wikipediaContext);
+      const quizData: QuizResponse = await enhancedQuizService.generateEnhancedQuiz(topic.trim());
+      console.log('Enhanced quiz data received:', quizData);
+      console.log('Wikipedia context:', quizData.wikipediaContext);
       setQuiz(quizData);
       setUserAnswers(new Array(quizData.questions.length).fill(-1));
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to generate enhanced quiz",
-      );
+      setError(err instanceof Error ? err.message : 'Failed to generate enhanced quiz');
     } finally {
       setIsGenerating(false);
     }
@@ -178,26 +216,26 @@ const QuizGeneratorPage: React.FC = () => {
   };
 
   const submitQuiz = async () => {
-    console.log("submitQuiz called:", {
+    console.log('submitQuiz called:', {
       hasQuiz: !!quiz,
       quizId: quiz?.quiz_id,
       userAnswers,
       hasUnanswered: userAnswers.includes(-1),
-      isSubmitted,
+      isSubmitted
     });
 
     if (!quiz) {
-      setError("No quiz loaded. Please generate a quiz first.");
+      setError('No quiz loaded. Please generate a quiz first.');
       return;
     }
 
     if (userAnswers.includes(-1)) {
-      setError("Please answer all questions before submitting");
+      setError('Please answer all questions before submitting');
       return;
     }
 
     if (!quiz.quiz_id) {
-      setError("Quiz ID is missing. Please generate a new quiz.");
+      setError('Quiz ID is missing. Please generate a new quiz.');
       return;
     }
 
@@ -206,65 +244,58 @@ const QuizGeneratorPage: React.FC = () => {
         quiz_id: quiz.quiz_id,
         answers: userAnswers,
       };
-
-      console.log("Submitting quiz:", submissionData);
-      console.log("API URL:", `${API_BASE_URL}/quiz/submit`);
-
+      
+      console.log('Submitting quiz:', submissionData);
+      console.log('API URL:', `${API_BASE_URL}/quiz/submit`);
+      
       const response = await fetch(`${API_BASE_URL}/quiz/submit`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(submissionData),
       });
 
-      console.log("Response status:", response.status);
-      console.log("Response ok:", response.ok);
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("Error response:", errorData);
-        throw new Error(
-          errorData.detail?.error ||
-            errorData.detail ||
-            "Failed to submit quiz",
-        );
+        console.error('Error response:', errorData);
+        throw new Error(errorData.detail?.error || errorData.detail || 'Failed to submit quiz');
       }
 
       const resultData: QuizResult = await response.json();
-      console.log("Quiz result received:", resultData);
-
+      console.log('Quiz result received:', resultData);
+      
       // Calculate average score and attempt count
-      const scoreStats = scoreService.calculateAverageScore(
-        resultData.quiz_id,
-        resultData.percentage,
-      );
-      console.log("Score statistics calculated:", scoreStats);
-
+      const scoreStats = scoreService.calculateAverageScore(resultData.quiz_id, resultData.percentage);
+      console.log('Score statistics calculated:', scoreStats);
+      
       // Add Wikipedia enhancement flag and score statistics to the result
       const enhancedResult: QuizResult = {
         ...resultData,
         wikipediaEnhanced: quiz?.wikipediaContext ? true : false,
         average_score: scoreStats.averageScore,
-        total_attempts: scoreStats.totalAttempts,
+        total_attempts: scoreStats.totalAttempts
       };
-
-      console.log("Quiz result before enhancement:", resultData);
-      console.log("Quiz context check:", quiz?.wikipediaContext);
-      console.log("Enhanced result:", enhancedResult);
-
+      
+      console.log('Quiz result before enhancement:', resultData);
+      console.log('Quiz context check:', quiz?.wikipediaContext);
+      console.log('Enhanced result:', enhancedResult);
+      
       setResults(enhancedResult);
       setIsSubmitted(true);
       setQuizHistory((prev) => [enhancedResult, ...prev]);
     } catch (err) {
-      console.error("Submit quiz error:", err);
-      setError(err instanceof Error ? err.message : "Failed to submit quiz");
+      console.error('Submit quiz error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to submit quiz');
     }
   };
 
   const startNewQuiz = () => {
     resetToMainPage();
-    window.history.replaceState({}, "", "/");
+    window.history.replaceState({}, '', '/');
   };
 
   return (
@@ -309,6 +340,8 @@ const QuizGeneratorPage: React.FC = () => {
         )}
 
         <HistorySection quizHistory={quizHistory} />
+        
+
       </main>
 
       <footer className={styles.appFooter}>

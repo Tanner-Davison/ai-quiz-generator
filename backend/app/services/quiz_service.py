@@ -55,6 +55,76 @@ Respond with ONLY this JSON format:
 
 The correct_answer should be the index (0-3) of the correct option."""
     
+    async def generate_enhanced_quiz(self, request: QuizRequest) -> QuizResponse:
+        """Generate an enhanced quiz using Wikipedia data while preserving original topic"""
+        try:
+            if not request.topic:
+                raise ValueError("Topic is required")
+            
+            # Check if topic is appropriate
+            if not self.is_topic_appropriate(request.topic):
+                raise ValueError("This topic is not appropriate for quiz generation. Please choose a different topic.")
+
+            print(f"DEBUG: Starting enhanced quiz generation for topic: {request.topic}")
+            logger.info(f"Generating enhanced quiz for topic: {request.topic}")
+            
+            # Use the enhanced prompt for generation, but keep original topic for response
+            prompt = request.enhancedPrompt or self.generate_quiz_prompt(request.topic)
+            print(f"DEBUG: Using enhanced prompt length: {len(prompt)}")
+
+            completion = await self.ai_service.generate_chat_completion(
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "You are a JSON generator. You must respond with ONLY valid, complete JSON. Never include explanatory text, markdown formatting, or any content outside the JSON object. Ensure all JSON syntax is correct with proper quotes, commas, and brackets.",
+                    },
+                    {"role": "user", "content": prompt},
+                ],
+                model=request.model,
+                temperature=request.temperature or 0.1,
+                max_tokens=1500,
+            )
+
+            response_text = completion.choices[0].message.content
+            print(f"DEBUG: Raw AI response length: {len(response_text)}")
+            print(f"DEBUG: Raw AI response: {response_text}")
+            
+            # Extract JSON from response
+            quiz_data = extract_json_from_response(response_text)
+            print(f"DEBUG: Extracted quiz data keys: {list(quiz_data.keys())}")
+            print(f"DEBUG: Extracted quiz data: {quiz_data}")
+            
+            # Validate and create quiz response
+            if "questions" not in quiz_data:
+                raise ValueError("Invalid quiz format: missing questions")
+            
+            questions = []
+            for i, q_data in enumerate(quiz_data["questions"]):
+                if not all(key in q_data for key in ["question", "options", "correct_answer", "explanation"]):
+                    raise ValueError(f"Invalid question format at index {i}")
+                
+                question = QuizQuestion(
+                    question=q_data["question"],
+                    options=q_data["options"],
+                    correct_answer=q_data["correct_answer"],
+                    explanation=q_data["explanation"]
+                )
+                questions.append(question)
+            
+            # Create response with original topic (not the enhanced prompt)
+            response = QuizResponse(
+                topic=request.topic,  # Use original topic, not enhanced prompt
+                questions=questions,
+                generated_at=datetime.now().isoformat()
+            )
+            
+            print(f"DEBUG: Successfully generated enhanced quiz with {len(questions)} questions")
+            return response
+            
+        except Exception as e:
+            logger.error(f"Enhanced quiz generation error: {str(e)}")
+            raise ValueError(f"Failed to generate enhanced quiz: {str(e)}")
+
     async def generate_quiz(self, request: QuizRequest) -> QuizResponse:
         """Generate a quiz based on the given topic"""
         try:

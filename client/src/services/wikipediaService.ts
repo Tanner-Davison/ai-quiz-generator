@@ -38,6 +38,7 @@ class WikipediaService {
   async searchArticles(query: string, limit: number = 5): Promise<WikipediaSearchResult[]> {
     try {
       const searchQuery = this.cleanQuery(query);
+      console.log('🔍 Wikipedia search query:', searchQuery);
       const params = new URLSearchParams({
         action: 'query',
         format: 'json',
@@ -48,24 +49,31 @@ class WikipediaService {
         origin: '*'
       });
 
-      const response = await fetch(`${this.searchUrl}?${params}`);
+      const url = `${this.searchUrl}?${params}`;
+      console.log('🌐 Wikipedia search URL:', url);
+      const response = await fetch(url);
       
       if (!response.ok) {
         throw new Error(`Wikipedia search failed: ${response.status}`);
       }
 
       const data = await response.json();
+      console.log('📚 Wikipedia search response:', data);
       
       if (!data.query || !data.query.search) {
+        console.log('❌ No search results in Wikipedia response');
         return [];
       }
 
-      return data.query.search.map((result: any) => ({
+      const results = data.query.search.map((result: any) => ({
         title: result.title,
         snippet: this.cleanSnippet(result.snippet),
         pageid: result.pageid,
         url: `https://en.wikipedia.org/wiki/${encodeURIComponent(result.title.replace(/\s+/g, '_'))}`
       }));
+      
+      console.log('✅ Wikipedia search results processed:', results);
+      return results;
     } catch (error) {
       console.error('Wikipedia search error:', error);
       return [];
@@ -78,13 +86,17 @@ class WikipediaService {
   async getArticle(title: string): Promise<WikipediaArticle | null> {
     try {
       const cleanTitle = title.replace(/\s+/g, '_');
-      const response = await fetch(`${this.baseUrl}/page/summary/${encodeURIComponent(cleanTitle)}`);
+      const url = `${this.baseUrl}/page/summary/${encodeURIComponent(cleanTitle)}`;
+      console.log('📖 Fetching Wikipedia article:', url);
+      const response = await fetch(url);
       
       if (!response.ok) {
+        console.log('❌ Wikipedia article fetch failed:', response.status);
         return null;
       }
 
       const data = await response.json();
+      console.log('📖 Wikipedia article data:', data);
       
       return {
         title: data.title,

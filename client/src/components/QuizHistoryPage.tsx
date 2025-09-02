@@ -34,6 +34,7 @@ const QuizHistoryPage: React.FC = () => {
       
       const historyData: QuizHistory[] = await response.json();
       console.log('Quiz history data from backend:', historyData);
+      console.log('Wikipedia enhanced flags:', historyData.map(quiz => ({ id: quiz.id, topic: quiz.topic, wikipediaEnhanced: quiz.wikipediaEnhanced })));
       
 
       
@@ -43,7 +44,8 @@ const QuizHistoryPage: React.FC = () => {
         return {
           ...quiz,
           average_score: scoreStats?.averageScore || quiz.average_score,
-          submission_count: scoreStats?.totalAttempts || quiz.submission_count
+          submission_count: scoreStats?.totalAttempts || quiz.submission_count,
+          wikipediaEnhanced: quiz.wikipediaEnhanced // Preserve the Wikipedia enhancement flag
         };
       });
       
@@ -159,7 +161,7 @@ const QuizHistoryPage: React.FC = () => {
                   )}
                   {quiz.submission_count > 2 && (() => {
                     const trend = scoreService.getPerformanceTrend(quiz.id);
-                    return trend.trend !== 0 && (
+                    return trend && trend.trend !== 0 && (
                       <div className={styles.statItem}>
                         <span className={styles.statLabel}>Trend:</span>
                         <span 

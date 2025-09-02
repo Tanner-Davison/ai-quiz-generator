@@ -34,6 +34,10 @@ async def generate_quiz(request: QuizRequest, force_model: str = None, db: Async
     print("ROUTE CALLED: /quiz/generate")
     print(f"Request topic: {request.topic}")
     print(f"Request model: {request.model}")
+    print(f"Request wikipediaEnhanced: {request.wikipediaEnhanced}")
+    print(f"Request wikipediaEnhanced type: {type(request.wikipediaEnhanced)}")
+    print(f"Request enhancedPrompt: {request.enhancedPrompt is not None}")
+    print(f"Request enhancedPrompt length: {len(request.enhancedPrompt) if request.enhancedPrompt else 0}")
     print("=" * 60)
     
     try:
@@ -43,7 +47,14 @@ async def generate_quiz(request: QuizRequest, force_model: str = None, db: Async
             request.model = force_model
         
         print("About to call quiz_service.generate_quiz()")
-        result = await quiz_service.generate_quiz(request)
+        # Use enhanced prompt if available, otherwise use regular topic
+        if request.enhancedPrompt and request.wikipediaEnhanced is True:
+            print("Using enhanced prompt with Wikipedia data")
+            # Pass the enhanced prompt to the quiz service but keep original topic
+            result = await quiz_service.generate_enhanced_quiz(request)
+        else:
+            print("Using regular topic")
+            result = await quiz_service.generate_quiz(request)
         print("quiz_service.generate_quiz() completed successfully")
         
         print("🔍 DEBUG: About to start database save process...")
@@ -60,6 +71,8 @@ async def generate_quiz(request: QuizRequest, force_model: str = None, db: Async
                 "wikipedia_enhanced": request.wikipediaEnhanced or False
             }
             print(f"📝 Quiz data to save: {quiz_data}")
+            print(f"🔍 DEBUG: request.wikipediaEnhanced = {request.wikipediaEnhanced}")
+            print(f"🔍 DEBUG: request.wikipediaEnhanced or False = {request.wikipediaEnhanced or False}")
             
             saved_quiz = await quiz_db_service.create(db, quiz_data)
             print(f"✅ Quiz saved to database with ID: {saved_quiz.id}")

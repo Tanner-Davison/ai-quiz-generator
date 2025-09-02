@@ -7,6 +7,7 @@ class QuizRequest(BaseModel):
     model: Optional[str] = None
     temperature: Optional[float] = 0.2
     wikipediaEnhanced: Optional[bool] = False
+    enhancedPrompt: Optional[str] = None
 
 class QuizQuestion(BaseModel):
     question: str
