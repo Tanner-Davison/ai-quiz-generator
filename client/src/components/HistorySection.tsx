@@ -25,13 +25,15 @@ const HistorySection: React.FC<HistorySectionProps> = ({ quizHistory }) => {
     <div className={styles.historySection}>
       <div className={styles.historyHeader}>
         <h3 className={styles.historyTitle}>Recent Quiz History</h3>
-        <p className={styles.historySubtitle}>Your latest quiz attempts</p>
+        <p className={styles.historySubtitle}>all quiz history</p>
       </div>
       <ul className={styles.historyList}>
         {quizHistory.slice(0, 5).map((result, index) => (
           <li key={index} className={styles.historyItem}>
             <div className={styles.historyItemHeader}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "8px" }}
+              >
                 <h4 className={styles.historyItemTitle}>{result.topic}</h4>
                 {result.wikipediaEnhanced && (
                   <WikipediaEnhancementBadge compact />
@@ -50,23 +52,30 @@ const HistorySection: React.FC<HistorySectionProps> = ({ quizHistory }) => {
               <span className={styles.historyItemDate}>
                 {new Date(result.submitted_at).toLocaleDateString()}
               </span>
-              <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '4px',
-                marginTop: '4px',
-                fontSize: '12px',
-                color: '#6b7280'
-              }}>
-                {result.personal_average_score !== null && result.personal_average_score !== undefined && (
-                  <span style={{ color: '#10b981', fontWeight: '500' }}>
-                    📊 Your Avg: {result.personal_average_score.toFixed(1)}% ({result.personal_attempts || 0} attempts)
-                  </span>
-                )}
-                <span style={{ color: '#6b7280' }}>
-                  🌍 Global Avg: {result.global_average_score !== null && result.global_average_score !== undefined 
-                    ? `${result.global_average_score.toFixed(1)}%` 
-                    : 'No data'} ({result.global_attempts || 0} total)
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "4px",
+                  marginTop: "4px",
+                  fontSize: "12px",
+                  color: "#6b7280",
+                }}
+              >
+                {result.personal_average_score !== null &&
+                  result.personal_average_score !== undefined && (
+                    <span style={{ color: "#10b981", fontWeight: "500" }}>
+                      📊 Your Avg: {result.personal_average_score.toFixed(1)}% (
+                      {result.personal_attempts || 0} attempts)
+                    </span>
+                  )}
+                <span style={{ color: "#6b7280" }}>
+                  🌍 Global Avg:{" "}
+                  {result.global_average_score !== null &&
+                  result.global_average_score !== undefined
+                    ? `${result.global_average_score.toFixed(1)}%`
+                    : "No data"}{" "}
+                  ({result.global_attempts || 0} total)
                 </span>
               </div>
             </div>
