@@ -189,10 +189,10 @@ const QuizHistoryPage: React.FC = () => {
                   <div className={styles.statItem}>
                     <span className={styles.statLabel}>Your Attempts:</span>
                     <span className={styles.statValue} style={{ 
-                      color: quiz.personal_attempts > 0 ? '#10b981' : '#6b7280', 
-                      fontWeight: quiz.personal_attempts > 0 ? '600' : 'normal' 
+                      color: (quiz.personal_attempts || 0) > 0 ? '#10b981' : '#6b7280', 
+                      fontWeight: (quiz.personal_attempts || 0) > 0 ? '600' : 'normal' 
                     }}>
-                      {quiz.personal_attempts}
+                      {quiz.personal_attempts || 0}
                     </span>
                   </div>
                   
@@ -200,7 +200,7 @@ const QuizHistoryPage: React.FC = () => {
                   <div className={styles.statItem}>
                     <span className={styles.statLabel}>Total Attempts:</span>
                     <span className={styles.statValue} style={{ color: '#6b7280' }}>
-                      {quiz.global_attempts}
+                      {quiz.global_attempts || 0}
                     </span>
                   </div>
                   {quiz.submission_count > 2 && (() => {

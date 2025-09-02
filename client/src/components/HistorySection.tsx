@@ -62,13 +62,13 @@ const HistorySection: React.FC<HistorySectionProps> = ({ quizHistory }) => {
               }}>
                 {result.personal_average_score !== null && result.personal_average_score !== undefined && (
                   <span style={{ color: '#10b981', fontWeight: '500' }}>
-                    📊 Your Avg: {result.personal_average_score.toFixed(1)}% ({result.personal_attempts} attempts)
+                    📊 Your Avg: {result.personal_average_score.toFixed(1)}% ({result.personal_attempts || 0} attempts)
                   </span>
                 )}
                 <span style={{ color: '#6b7280' }}>
                   🌍 Global Avg: {result.global_average_score !== null && result.global_average_score !== undefined 
                     ? `${result.global_average_score.toFixed(1)}%` 
-                    : 'No data'} ({result.global_attempts} total)
+                    : 'No data'} ({result.global_attempts || 0} total)
                 </span>
               </div>
             </div>
