@@ -78,7 +78,7 @@ const QuizGeneratorPage: React.FC = () => {
         throw new Error(errorData.detail?.error || 'Failed to load quiz history');
       }
       
-      const historyData = await response.json();
+      const historyData: QuizHistory[] = await response.json();
       
       // Convert QuizHistory to QuizResult format for display
       const quizResults = historyData.map((quiz) => ({
