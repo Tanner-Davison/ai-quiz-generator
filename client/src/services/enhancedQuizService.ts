@@ -1,7 +1,3 @@
-/**
- * Enhanced Quiz Generation Service
- * Uses Wikipedia to provide better context and more accurate information for quiz generation
- */
 
 import { wikipediaService, type WikipediaArticle } from "./wikipediaService";
 
@@ -35,23 +31,14 @@ class EnhancedQuizService {
   private readonly API_BASE_URL =
     import.meta.env.VITE_API_URL || "http://localhost:3000";
 
-  /**
-   * Generate an enhanced quiz using Wikipedia data for better accuracy
-   */
   async generateEnhancedQuiz(topic: string): Promise<EnhancedQuizResponse> {
     try {
-      // First, gather Wikipedia context for the topic
       const wikipediaContext = await this.gatherWikipediaContext(topic);
-
-      // Create enhanced prompt with Wikipedia data
       const enhancedPrompt = this.createEnhancedPrompt(topic, wikipediaContext);
-
-      // Use the enhanced prompt with Wikipedia data
       const requestBody = {
         topic: topic.trim(),
-        // Include the enhanced prompt in the topic for now
         enhancedPrompt: enhancedPrompt,
-        wikipediaEnhanced: true, // Mark this quiz as Wikipedia enhanced
+        wikipediaEnhanced: true,
       };
 
       const response = await fetch(`${this.API_BASE_URL}/quiz/generate`, {
@@ -70,12 +57,9 @@ class EnhancedQuizService {
       }
 
       const quizData = await response.json();
-
-      // Enhance the quiz with Wikipedia sources
       return this.enhanceQuizWithSources(quizData, wikipediaContext);
     } catch (error) {
       console.error("Enhanced quiz generation error:", error);
-      // Fallback to regular quiz generation but still mark as enhanced if we have context
       try {
         const wikipediaContext = await this.gatherWikipediaContext(topic);
         const regularQuiz = await this.generateRegularQuiz(topic);
@@ -87,21 +71,16 @@ class EnhancedQuizService {
     }
   }
 
-  /**
-   * Gather comprehensive Wikipedia context for a topic
-   */
   private async gatherWikipediaContext(
     topic: string,
   ): Promise<WikipediaContext> {
     try {
-      // Search for main topic article
       const mainSearchResults = await wikipediaService.searchArticles(topic, 3);
 
       if (mainSearchResults.length === 0) {
         return this.createEmptyContext();
       }
 
-      // Get detailed articles
       const articles: WikipediaArticle[] = [];
       const keyFacts: string[] = [];
       const relatedTopics: string[] = [];
@@ -111,23 +90,20 @@ class EnhancedQuizService {
         if (article) {
           articles.push(article);
 
-          // Extract key facts from article
           const facts = this.extractKeyFacts(article.extract);
           keyFacts.push(...facts);
 
-          // Extract related topics from sections
           if (article.sections) {
             relatedTopics.push(...article.sections.slice(0, 5));
           }
         }
       }
 
-      // Create summary from articles
       const summary = this.createSummary(articles);
 
       const context = {
         articles,
-        keyFacts: [...new Set(keyFacts)], // Remove duplicates
+        keyFacts: [...new Set(keyFacts)],
         relatedTopics: [...new Set(relatedTopics)],
         summary,
       };
@@ -139,9 +115,6 @@ class EnhancedQuizService {
     }
   }
 
-  /**
-   * Create enhanced prompt with Wikipedia data
-   */
   private createEnhancedPrompt(
     topic: string,
     context: WikipediaContext,
@@ -186,11 +159,7 @@ class EnhancedQuizService {
     return prompt;
   }
 
-  /**
-   * Extract key facts from Wikipedia article text
-   */
   private extractKeyFacts(text: string): string[] {
-    // Simple fact extraction - look for sentences with key indicators
     const sentences = text.split(/[.!?]+/).filter((s) => s.trim().length > 20);
 
     const keyIndicators = [
@@ -217,24 +186,19 @@ class EnhancedQuizService {
         const lower = sentence.toLowerCase();
         return keyIndicators.some((indicator) => lower.includes(indicator));
       })
-      .slice(0, 8) // Limit to 8 key facts
+      .slice(0, 8)
       .map((fact) => fact.trim());
   }
 
-  /**
-   * Create summary from multiple Wikipedia articles
-   */
   private createSummary(articles: WikipediaArticle[]): string {
     if (articles.length === 0) return "";
 
-    // Use the first article's extract as the main summary
     const mainExtract = articles[0].extract;
 
-    // If we have multiple articles, try to combine key information
     if (articles.length > 1) {
       const additionalFacts = articles
         .slice(1)
-        .map((article) => article.extract.split(".")[0]) // First sentence
+        .map((article) => article.extract.split(".")[0])
         .filter((fact) => fact.length > 20)
         .slice(0, 2);
 
@@ -243,10 +207,6 @@ class EnhancedQuizService {
 
     return mainExtract;
   }
-
-  /**
-   * Enhance quiz with Wikipedia sources
-   */
 
   private enhanceQuizWithSources(
     quizData: any,
@@ -265,9 +225,6 @@ class EnhancedQuizService {
     return enhancedQuiz;
   }
 
-  /**
-   * Fallback to regular quiz generation
-   */
   private async generateRegularQuiz(
     topic: string,
   ): Promise<EnhancedQuizResponse> {
@@ -278,7 +235,7 @@ class EnhancedQuizService {
       },
       body: JSON.stringify({
         topic: topic.trim(),
-        wikipediaEnhanced: false, // Regular quiz, not enhanced
+        wikipediaEnhanced: false,
       }),
     });
 
@@ -290,9 +247,6 @@ class EnhancedQuizService {
     return await response.json();
   }
 
-  /**
-   * Create empty context when Wikipedia data is unavailable
-   */
   private createEmptyContext(): WikipediaContext {
     return {
       articles: [],
@@ -302,9 +256,6 @@ class EnhancedQuizService {
     };
   }
 
-  /**
-   * Get Wikipedia articles for a specific topic (for display purposes)
-   */
   async getWikipediaArticles(topic: string): Promise<WikipediaArticle[]> {
     try {
       const searchResults = await wikipediaService.searchArticles(topic, 3);

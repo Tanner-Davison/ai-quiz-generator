@@ -22,8 +22,6 @@ const QuizSection: React.FC<QuizSectionProps> = ({
   showResults = false,
   isSubmitted = false,
 }) => {
-
-
   return (
     <div className={styles.quizSection}>
       <div className={styles.quizHeader}>

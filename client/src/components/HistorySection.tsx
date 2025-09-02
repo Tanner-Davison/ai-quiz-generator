@@ -3,13 +3,11 @@ import { HistorySectionStyles as styles } from "../cssmodules";
 import type { QuizResult } from "../types/quiz";
 import WikipediaEnhancementBadge from "./WikipediaEnhancementBadge";
 
-
 interface HistorySectionProps {
   quizHistory: QuizResult[];
 }
 
 const HistorySection: React.FC<HistorySectionProps> = ({ quizHistory }) => {
-
   if (quizHistory.length === 0) {
     return (
       <div className={styles.historySection}>

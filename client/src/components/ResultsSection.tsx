@@ -15,7 +15,6 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
 }) => {
   const scoreThreshold = results.score;
   
-  // dynamic score color
   const scoreClass =
     scoreThreshold <= 2
       ? styles.lowScore

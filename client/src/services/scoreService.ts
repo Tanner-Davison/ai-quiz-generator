@@ -1,8 +1,3 @@
-/**
- * Score Management Service
- * Handles calculation and storage of quiz scores and averages
- */
-
 
 
 export interface ScoreStats {
@@ -16,28 +11,22 @@ export interface ScoreStats {
 class ScoreService {
   private readonly STORAGE_KEY = 'quiz_scores';
 
-  /**
-   * Calculate average score for a quiz based on all attempts
-   */
   calculateAverageScore(quizId: string, newScore: number): ScoreStats {
     const allScores = this.getAllScores();
     const quizScores = allScores[quizId] || [];
     
-    // Add the new score
     const updatedScores = [...quizScores, newScore];
     
-    // Calculate statistics
     const averageScore = updatedScores.reduce((sum, score) => sum + score, 0) / updatedScores.length;
     const bestScore = Math.max(...updatedScores);
     const worstScore = Math.min(...updatedScores);
-    const recentScores = updatedScores.slice(-5); // Last 5 attempts
+    const recentScores = updatedScores.slice(-5);
     
-    // Save updated scores
     allScores[quizId] = updatedScores;
     this.saveAllScores(allScores);
     
     return {
-      averageScore: Math.round(averageScore * 10) / 10, // Round to 1 decimal
+      averageScore: Math.round(averageScore * 10) / 10,
       totalAttempts: updatedScores.length,
       bestScore,
       worstScore,
@@ -45,9 +34,6 @@ class ScoreService {
     };
   }
 
-  /**
-   * Get score statistics for a specific quiz
-   */
   getScoreStats(quizId: string): ScoreStats | null {
     const allScores = this.getAllScores();
     const quizScores = allScores[quizId];
@@ -70,9 +56,6 @@ class ScoreService {
     };
   }
 
-  /**
-   * Get all scores for all quizzes
-   */
   private getAllScores(): Record<string, number[]> {
     try {
       const stored = localStorage.getItem(this.STORAGE_KEY);
@@ -83,9 +66,6 @@ class ScoreService {
     }
   }
 
-  /**
-   * Save all scores to localStorage
-   */
   private saveAllScores(scores: Record<string, number[]>): void {
     try {
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(scores));
@@ -94,16 +74,11 @@ class ScoreService {
     }
   }
 
-  /**
-   * Clear all scores (for testing/debugging)
-   */
   clearAllScores(): void {
     localStorage.removeItem(this.STORAGE_KEY);
   }
 
-  /**
-   * Get leaderboard of best average scores
-   */
+
   getLeaderboard(limit: number = 10): Array<{ quizId: string; averageScore: number; totalAttempts: number }> {
     const allScores = this.getAllScores();
     const leaderboard: Array<{ quizId: string; averageScore: number; totalAttempts: number }> = [];
@@ -124,9 +99,6 @@ class ScoreService {
       .slice(0, limit);
   }
 
-  /**
-   * Get performance trends for a quiz
-   */
   getPerformanceTrend(quizId: string): { improving: boolean; trend: number } {
     const allScores = this.getAllScores();
     const quizScores = allScores[quizId];
@@ -135,7 +107,6 @@ class ScoreService {
       return { improving: false, trend: 0 };
     }
     
-    // Compare first half vs second half of attempts
     const midPoint = Math.floor(quizScores.length / 2);
     const firstHalf = quizScores.slice(0, midPoint);
     const secondHalf = quizScores.slice(midPoint);

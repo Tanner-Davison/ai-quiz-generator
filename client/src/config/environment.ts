@@ -1,4 +1,4 @@
-// Environment configuration utility
+
 export interface EnvironmentConfig {
   apiUrl: string;
   environment: string;
@@ -7,7 +7,6 @@ export interface EnvironmentConfig {
   isProduction: boolean;
 }
 
-// Get environment configuration
 export const getEnvironmentConfig = (): EnvironmentConfig => {
   const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
   const environment = import.meta.env.VITE_ENVIRONMENT || 'development';
@@ -22,16 +21,14 @@ export const getEnvironmentConfig = (): EnvironmentConfig => {
   };
 };
 
-// API URL builder
 export const buildApiUrl = (endpoint: string): string => {
   const config = getEnvironmentConfig();
-  const baseUrl = config.apiUrl.replace(/\/$/, ''); // Remove trailing slash
-  const cleanEndpoint = endpoint.replace(/^\//, ''); // Remove leading slash
+  const baseUrl = config.apiUrl.replace(/\/$/, '');
+  const cleanEndpoint = endpoint.replace(/^\//, '');
   
   return `${baseUrl}/${cleanEndpoint}`;
 };
 
-// Environment-specific logging
 export const log = (message: string, data?: any): void => {
   const config = getEnvironmentConfig();
   
@@ -40,7 +37,6 @@ export const log = (message: string, data?: any): void => {
   }
 };
 
-// Environment-specific error logging
 export const logError = (message: string, error?: any): void => {
   const config = getEnvironmentConfig();
   
