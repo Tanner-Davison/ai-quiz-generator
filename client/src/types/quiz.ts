@@ -56,4 +56,9 @@ export interface QuizHistory {
   submission_count: number;
   average_score?: number;
   wikipediaEnhanced?: boolean;
+  // New fields for personal vs global averages
+  personal_average_score?: number | null;
+  personal_attempts?: number;
+  global_average_score?: number | null;
+  global_attempts?: number;
 }

@@ -212,7 +212,23 @@ async def submit_quiz(submission: QuizSubmission, db: AsyncSession = Depends(get
             feedback=feedback,
         )
 
-        # Store result
+        # Save submission to database
+        try:
+            submission_data = {
+                "quiz_id": submission.quiz_id,
+                "user_id": "anonymous",  # For now, use anonymous user
+                "score": score,
+                "total_questions": len(questions),
+                "percentage": (score / len(questions)) * 100
+            }
+            print(f"💾 Saving quiz submission to database: {submission_data}")
+            saved_submission = await submission_db_service.create(db, submission_data)
+            print(f"✅ Quiz submission saved with ID: {saved_submission.id}")
+        except Exception as db_error:
+            print(f"❌ Failed to save submission to database: {db_error}")
+            # Continue without database save for now
+
+        # Store result in memory (for backward compatibility)
         quiz_results.append(result)
 
         return result
