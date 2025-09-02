@@ -1,6 +1,7 @@
 import React from "react";
 import { HistorySectionStyles as styles } from "../cssmodules";
 import type { QuizResult } from "../types/quiz";
+import { Link } from "react-router-dom";
 import WikipediaEnhancementBadge from "./WikipediaEnhancementBadge";
 
 interface HistorySectionProps {
@@ -25,7 +26,9 @@ const HistorySection: React.FC<HistorySectionProps> = ({ quizHistory }) => {
     <div className={styles.historySection}>
       <div className={styles.historyHeader}>
         <h3 className={styles.historyTitle}>Recent Quiz History</h3>
-        <p className={styles.historySubtitle}>all quiz history</p>
+        <Link to="/history" className={styles.historySubtitle}>
+          view all generated quizzes
+        </Link>
       </div>
       <ul className={styles.historyList}>
         {quizHistory.slice(0, 5).map((result, index) => (
