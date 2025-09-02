@@ -52,26 +52,25 @@ const HistorySection: React.FC<HistorySectionProps> = ({ quizHistory }) => {
               <span className={styles.historyItemDate}>
                 {new Date(result.submitted_at).toLocaleDateString()}
               </span>
-              {(result.average_score !== undefined || result.total_attempts !== undefined) && (
-                <div style={{
-                  display: 'flex',
-                  gap: '12px',
-                  marginTop: '4px',
-                  fontSize: '12px',
-                  color: '#6b7280'
-                }}>
-                  {result.average_score !== undefined && result.average_score !== null && (
-                    <span>
-                      📊 Avg: {result.average_score.toFixed(1)}%
-                    </span>
-                  )}
-                  {result.total_attempts !== undefined && result.total_attempts !== null && (
-                    <span>
-                      🔄 Attempts: {result.total_attempts}
-                    </span>
-                  )}
-                </div>
-              )}
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '4px',
+                marginTop: '4px',
+                fontSize: '12px',
+                color: '#6b7280'
+              }}>
+                {result.personal_average_score !== null && result.personal_average_score !== undefined && (
+                  <span style={{ color: '#10b981', fontWeight: '500' }}>
+                    📊 Your Avg: {result.personal_average_score.toFixed(1)}% ({result.personal_attempts} attempts)
+                  </span>
+                )}
+                <span style={{ color: '#6b7280' }}>
+                  🌍 Global Avg: {result.global_average_score !== null && result.global_average_score !== undefined 
+                    ? `${result.global_average_score.toFixed(1)}%` 
+                    : 'No data'} ({result.global_attempts} total)
+                </span>
+              </div>
             </div>
           </li>
         ))}

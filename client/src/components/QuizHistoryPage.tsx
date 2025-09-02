@@ -33,19 +33,38 @@ const QuizHistoryPage: React.FC = () => {
       }
       
       const historyData: QuizHistory[] = await response.json();
-      
-
+      console.log('🔍 Debug - Raw history data from backend:', historyData.map(quiz => ({
+        id: quiz.id,
+        topic: quiz.topic,
+        average_score: quiz.average_score,
+        submission_count: quiz.submission_count
+      })));
       
       // Enhance real quiz data with score statistics
       const enhancedHistoryData = historyData.map(quiz => {
         const scoreStats = scoreService.getScoreStats(quiz.id);
         return {
           ...quiz,
+          // Keep both personal and global averages
+          personal_average_score: scoreStats?.averageScore || null,
+          personal_attempts: scoreStats?.totalAttempts || 0,
+          global_average_score: quiz.average_score,
+          global_attempts: quiz.submission_count,
+          // For backward compatibility, use personal if available, otherwise global
           average_score: scoreStats?.averageScore || quiz.average_score,
           submission_count: scoreStats?.totalAttempts || quiz.submission_count,
           wikipediaEnhanced: quiz.wikipediaEnhanced // Preserve the Wikipedia enhancement flag
         };
       });
+      
+      console.log('🔍 Debug - Enhanced history data:', enhancedHistoryData.map(quiz => ({
+        id: quiz.id,
+        topic: quiz.topic,
+        personal_average_score: quiz.personal_average_score,
+        personal_attempts: quiz.personal_attempts,
+        global_average_score: quiz.global_average_score,
+        global_attempts: quiz.global_attempts
+      })));
       
       setQuizHistory(enhancedHistoryData);
     } catch (err) {
@@ -145,18 +164,45 @@ const QuizHistoryPage: React.FC = () => {
                     <span className={styles.statLabel}>Questions:</span>
                     <span className={styles.statValue}>{quiz.question_count}</span>
                   </div>
-                  {quiz.average_score !== null && quiz.average_score !== undefined && (
+                  
+                  {/* Personal Average Score */}
+                  {quiz.personal_average_score !== null && quiz.personal_average_score !== undefined && (
                     <div className={styles.statItem}>
-                      <span className={styles.statLabel}>Avg Score:</span>
-                      <span className={styles.statValue}>{quiz.average_score.toFixed(1)}%</span>
+                      <span className={styles.statLabel}>Your Avg:</span>
+                      <span className={styles.statValue} style={{ color: '#10b981', fontWeight: '600' }}>
+                        {quiz.personal_average_score.toFixed(1)}%
+                      </span>
                     </div>
                   )}
-                  {quiz.submission_count > 0 && (
-                    <div className={styles.statItem}>
-                      <span className={styles.statLabel}>Attempts:</span>
-                      <span className={styles.statValue}>{quiz.submission_count}</span>
-                    </div>
-                  )}
+                  
+                  {/* Global Average Score - Always show if we have data */}
+                  <div className={styles.statItem}>
+                    <span className={styles.statLabel}>Global Avg:</span>
+                    <span className={styles.statValue} style={{ color: '#6b7280' }}>
+                      {quiz.global_average_score !== null && quiz.global_average_score !== undefined 
+                        ? `${quiz.global_average_score.toFixed(1)}%` 
+                        : 'No data'}
+                    </span>
+                  </div>
+                  
+                  {/* Personal Attempts - Always show */}
+                  <div className={styles.statItem}>
+                    <span className={styles.statLabel}>Your Attempts:</span>
+                    <span className={styles.statValue} style={{ 
+                      color: quiz.personal_attempts > 0 ? '#10b981' : '#6b7280', 
+                      fontWeight: quiz.personal_attempts > 0 ? '600' : 'normal' 
+                    }}>
+                      {quiz.personal_attempts}
+                    </span>
+                  </div>
+                  
+                  {/* Global Attempts - Always show */}
+                  <div className={styles.statItem}>
+                    <span className={styles.statLabel}>Total Attempts:</span>
+                    <span className={styles.statValue} style={{ color: '#6b7280' }}>
+                      {quiz.global_attempts}
+                    </span>
+                  </div>
                   {quiz.submission_count > 2 && (() => {
                     const trend = scoreService.getPerformanceTrend(quiz.id);
                     return trend && trend.trend !== 0 && (

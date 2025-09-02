@@ -81,20 +81,29 @@ const QuizGeneratorPage: React.FC = () => {
       const historyData: QuizHistory[] = await response.json();
       
       // Convert QuizHistory to QuizResult format for display
-      const quizResults = historyData.map((quiz) => ({
-        quiz_id: quiz.id,
-        topic: quiz.topic,
-        user_answers: [],
-        correct_answers: [],
-        score: 0,
-        total_questions: quiz.question_count,
-        percentage: 0,
-        submitted_at: quiz.created_at,
-        feedback: [],
-        wikipediaEnhanced: quiz.wikipediaEnhanced || false,
-        average_score: quiz.average_score,
-        total_attempts: quiz.submission_count
-      }));
+      const quizResults = historyData.map((quiz) => {
+        const scoreStats = scoreService.getScoreStats(quiz.id);
+        return {
+          quiz_id: quiz.id,
+          topic: quiz.topic,
+          user_answers: [],
+          correct_answers: [],
+          score: 0,
+          total_questions: quiz.question_count,
+          percentage: 0,
+          submitted_at: quiz.created_at,
+          feedback: [],
+          wikipediaEnhanced: quiz.wikipediaEnhanced || false,
+          // Backward compatibility
+          average_score: scoreStats?.averageScore || quiz.average_score,
+          total_attempts: scoreStats?.totalAttempts || quiz.submission_count,
+          // New personal vs global fields
+          personal_average_score: scoreStats?.averageScore || null,
+          personal_attempts: scoreStats?.totalAttempts || 0,
+          global_average_score: quiz.average_score,
+          global_attempts: quiz.submission_count
+        };
+      });
       
       setQuizHistory(quizResults);
     } catch (error) {

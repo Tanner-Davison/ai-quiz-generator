@@ -39,6 +39,11 @@ export interface QuizResult {
   wikipediaEnhanced?: boolean;
   average_score?: number;
   total_attempts?: number;
+  // New fields for personal vs global averages
+  personal_average_score?: number | null;
+  personal_attempts?: number;
+  global_average_score?: number | null;
+  global_attempts?: number;
 }
 
 export interface QuizHistory {
