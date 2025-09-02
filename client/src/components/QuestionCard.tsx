@@ -9,6 +9,7 @@ interface QuestionCardProps {
   onAnswerSelect: (questionIndex: number, answerIndex: number) => void;
   showResults?: boolean;
   isSubmitted?: boolean;
+  topic?: string;
 }
 
 const QuestionCard: React.FC<QuestionCardProps> = ({
@@ -26,6 +27,19 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
       <div className={styles.questionHeader}>
         <div className={styles.questionNumber}>Question {questionIndex + 1}</div>
         <p className={styles.questionText}>{question.question}</p>
+        {question.wikipediaSources && question.wikipediaSources.length > 0 && (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px',
+            marginTop: '8px',
+            fontSize: '12px',
+            color: '#6b7280'
+          }}>
+            <span>📚</span>
+            <span>Enhanced with Wikipedia data</span>
+          </div>
+        )}
       </div>
       
       <ul className={styles.answersList}>

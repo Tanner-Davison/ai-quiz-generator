@@ -1,5 +1,5 @@
 import React from "react";
-import { QuestionCard } from "./index";
+import { QuestionCard, WikipediaSources } from "./index";
 import { QuizSectionStyles as styles } from "../cssmodules";
 import type { QuizResponse } from "../types/quiz";
 
@@ -73,6 +73,10 @@ const QuizSection: React.FC<QuizSectionProps> = ({
         )}
       </div>
 
+      {quiz.wikipediaContext && (
+        <WikipediaSources wikipediaContext={quiz.wikipediaContext} />
+      )}
+
       <div className={styles.questionsContainer}>
         {quiz.questions.map((question, questionIndex) => (
           <QuestionCard
@@ -83,6 +87,7 @@ const QuizSection: React.FC<QuizSectionProps> = ({
             onAnswerSelect={onAnswerSelect}
             showResults={showResults}
             isSubmitted={isSubmitted}
+            topic={quiz.topic}
           />
         ))}
       </div>

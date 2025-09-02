@@ -2,13 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GlobalHistorySectionStyles as styles } from '../cssmodules';
 import type { QuizHistory } from '../types/quiz';
+import WikipediaEnhancementBadge from './WikipediaEnhancementBadge';
+import { scoreService } from '../services/scoreService';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
+
 
 const QuizHistoryPage: React.FC = () => {
   const [quizHistory, setQuizHistory] = useState<QuizHistory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,7 +33,21 @@ const QuizHistoryPage: React.FC = () => {
       }
       
       const historyData: QuizHistory[] = await response.json();
-      setQuizHistory(historyData);
+      console.log('Quiz history data from backend:', historyData);
+      
+
+      
+      // Enhance real quiz data with score statistics
+      const enhancedHistoryData = historyData.map(quiz => {
+        const scoreStats = scoreService.getScoreStats(quiz.id);
+        return {
+          ...quiz,
+          average_score: scoreStats?.averageScore || quiz.average_score,
+          submission_count: scoreStats?.totalAttempts || quiz.submission_count
+        };
+      });
+      
+      setQuizHistory(enhancedHistoryData);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch quiz history');
     } finally {
@@ -65,6 +84,7 @@ const QuizHistoryPage: React.FC = () => {
         </button>
         <h1 className={styles.pageTitle}>All Quiz History</h1>
         <p className={styles.pageSubtitle}>Click on any quiz to take it again</p>
+
       </header>
 
       <main className={styles.pageContent}>
@@ -89,22 +109,31 @@ const QuizHistoryPage: React.FC = () => {
 
         {!isLoading && !error && quizHistory.length > 0 && (
           <div className={styles.historyGrid}>
-            {quizHistory.map((quiz) => (
-              <div 
-                key={quiz.id} 
-                className={styles.historyCard}
-                onClick={() => handleTakeQuiz(quiz.id)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleTakeQuiz(quiz.id);
-                  }
-                }}
-              >
+            {quizHistory.map((quiz) => {
+
+              
+              return (
+                <div 
+                  key={quiz.id} 
+                  className={styles.historyCard}
+                  onClick={() => handleTakeQuiz(quiz.id)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleTakeQuiz(quiz.id);
+                    }
+                  }}
+                >
                 <div className={styles.historyCardHeader}>
-                  <h4 className={styles.historyCardTitle}>{quiz.topic}</h4>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                    <h4 className={styles.historyCardTitle}>{quiz.topic}</h4>
+                    {quiz.wikipediaEnhanced && (
+                      <WikipediaEnhancementBadge />
+                    )}
+
+                  </div>
                   <div className={styles.historyCardMeta}>
                     <span className={styles.modelBadge}>{quiz.model || 'Default'}</span>
                     <span className={styles.tempBadge}>Temp: {quiz.temperature}</span>
@@ -122,6 +151,29 @@ const QuizHistoryPage: React.FC = () => {
                       <span className={styles.statValue}>{quiz.average_score.toFixed(1)}%</span>
                     </div>
                   )}
+                  {quiz.submission_count > 0 && (
+                    <div className={styles.statItem}>
+                      <span className={styles.statLabel}>Attempts:</span>
+                      <span className={styles.statValue}>{quiz.submission_count}</span>
+                    </div>
+                  )}
+                  {quiz.submission_count > 2 && (() => {
+                    const trend = scoreService.getPerformanceTrend(quiz.id);
+                    return trend.trend !== 0 && (
+                      <div className={styles.statItem}>
+                        <span className={styles.statLabel}>Trend:</span>
+                        <span 
+                          className={styles.statValue}
+                          style={{ 
+                            color: trend.improving ? '#22c55e' : '#ef4444',
+                            fontWeight: '600'
+                          }}
+                        >
+                          {trend.improving ? '📈' : '📉'} {Math.abs(trend.trend).toFixed(1)}%
+                        </span>
+                      </div>
+                    );
+                  })()}
                 </div>
                 
                 <div className={styles.historyCardFooter}>
@@ -133,7 +185,8 @@ const QuizHistoryPage: React.FC = () => {
                   </div>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
 

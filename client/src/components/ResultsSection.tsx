@@ -14,6 +14,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
   onStartNewQuiz,
 }) => {
   const scoreThreshold = results.score;
+  
   // dynamic score color
   const scoreClass =
     scoreThreshold <= 2
@@ -78,6 +79,19 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
                 <p className={styles.explanation}>
                   <strong>Explanation:</strong>{" "}
                   {quiz.questions[index].explanation}
+                  {quiz.questions[index].wikipediaSources && quiz.questions[index].wikipediaSources.length > 0 && (
+                    <span style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      marginLeft: '8px',
+                      fontSize: '12px',
+                      color: '#6b7280'
+                    }}>
+                      <span>📚</span>
+                      <span>Wikipedia enhanced</span>
+                    </span>
+                  )}
                 </p>
               )}
               {!isCorrect && quiz && (

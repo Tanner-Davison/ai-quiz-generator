@@ -6,6 +6,7 @@ class QuizRequest(BaseModel):
     topic: str
     model: Optional[str] = None
     temperature: Optional[float] = 0.2
+    wikipediaEnhanced: Optional[bool] = False
 
 class QuizQuestion(BaseModel):
     question: str
@@ -43,3 +44,4 @@ class QuizHistory(BaseModel):
     question_count: int
     submission_count: int
     average_score: Optional[float] = None
+    wikipediaEnhanced: Optional[bool] = False

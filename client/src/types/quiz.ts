@@ -1,8 +1,21 @@
+export interface WikipediaContext {
+  articles: Array<{
+    title: string;
+    extract: string;
+    url: string;
+    pageid: number;
+  }>;
+  keyFacts: string[];
+  relatedTopics: string[];
+  summary: string;
+}
+
 export interface QuizQuestion {
   question: string;
   options: string[];
   correct_answer: number;
   explanation: string;
+  wikipediaSources?: string[];
 }
 
 export interface QuizResponse {
@@ -10,6 +23,7 @@ export interface QuizResponse {
   topic: string;
   questions: QuizQuestion[];
   generated_at: string;
+  wikipediaContext?: WikipediaContext;
 }
 
 export interface QuizResult {
@@ -22,6 +36,9 @@ export interface QuizResult {
   percentage: number;
   submitted_at: string;
   feedback: string[];
+  wikipediaEnhanced?: boolean;
+  average_score?: number;
+  total_attempts?: number;
 }
 
 export interface QuizHistory {
@@ -33,4 +50,5 @@ export interface QuizHistory {
   question_count: number;
   submission_count: number;
   average_score?: number;
+  wikipediaEnhanced?: boolean;
 }

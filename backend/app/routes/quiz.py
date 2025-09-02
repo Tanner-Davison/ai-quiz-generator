@@ -56,7 +56,8 @@ async def generate_quiz(request: QuizRequest, force_model: str = None, db: Async
             quiz_data = {
                 "topic": result.topic,
                 "model": request.model or "llama-3.1-8b-instant",
-                "temperature": request.temperature or 0.2
+                "temperature": request.temperature or 0.2,
+                "wikipedia_enhanced": request.wikipediaEnhanced or False
             }
             print(f"📝 Quiz data to save: {quiz_data}")
             
@@ -257,7 +258,8 @@ async def get_quiz_history(
                 created_at=quiz.created_at,
                 question_count=question_count,
                 submission_count=submission_count,
-                average_score=average_score
+                average_score=average_score,
+                wikipediaEnhanced=quiz.wikipedia_enhanced
             )
             history_items.append(history_item)
         
