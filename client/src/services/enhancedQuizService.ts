@@ -38,17 +38,12 @@ class EnhancedQuizService {
    * Generate an enhanced quiz using Wikipedia data for better accuracy
    */
   async generateEnhancedQuiz(topic: string): Promise<EnhancedQuizResponse> {
-    console.log('🚀 generateEnhancedQuiz called for topic:', topic);
     try {
       // First, gather Wikipedia context for the topic
-      console.log('🔍 Gathering Wikipedia context...');
       const wikipediaContext = await this.gatherWikipediaContext(topic);
-      console.log('✅ Wikipedia context gathered:', wikipediaContext);
       
       // Create enhanced prompt with Wikipedia data
       const enhancedPrompt = this.createEnhancedPrompt(topic, wikipediaContext);
-      console.log('📝 Enhanced prompt created, length:', enhancedPrompt.length);
-      console.log('📝 Enhanced prompt preview:', enhancedPrompt.substring(0, 200) + '...');
       
       // Use the enhanced prompt with Wikipedia data
       const requestBody = { 
@@ -57,8 +52,6 @@ class EnhancedQuizService {
         enhancedPrompt: enhancedPrompt,
         wikipediaEnhanced: true // Mark this quiz as Wikipedia enhanced
       };
-      
-      console.log('🚀 Enhanced quiz request body:', requestBody);
       
       const response = await fetch(`${this.API_BASE_URL}/quiz/generate`, {
         method: 'POST',
@@ -79,7 +72,6 @@ class EnhancedQuizService {
       return this.enhanceQuizWithSources(quizData, wikipediaContext);
     } catch (error) {
       console.error('Enhanced quiz generation error:', error);
-      console.error('Error details:', error);
       // Fallback to regular quiz generation but still mark as enhanced if we have context
       try {
         const wikipediaContext = await this.gatherWikipediaContext(topic);
@@ -87,7 +79,6 @@ class EnhancedQuizService {
         return this.enhanceQuizWithSources(regularQuiz, wikipediaContext);
       } catch (fallbackError) {
         console.error('Fallback quiz generation error:', fallbackError);
-        console.error('Fallback error details:', fallbackError);
         return this.generateRegularQuiz(topic);
       }
     }
@@ -98,14 +89,10 @@ class EnhancedQuizService {
    */
   private async gatherWikipediaContext(topic: string): Promise<WikipediaContext> {
     try {
-      console.log('🔍 Gathering Wikipedia context for topic:', topic);
       // Search for main topic article
-      console.log('🔍 Searching Wikipedia for:', topic);
       const mainSearchResults = await wikipediaService.searchArticles(topic, 3);
-      console.log('📚 Wikipedia search results:', mainSearchResults);
       
       if (mainSearchResults.length === 0) {
-        console.log('No Wikipedia results found, returning empty context');
         return this.createEmptyContext();
       }
 
@@ -140,7 +127,6 @@ class EnhancedQuizService {
         summary
       };
 
-      console.log('Wikipedia context created:', context);
       return context;
     } catch (error) {
       console.error('Error gathering Wikipedia context:', error);
@@ -245,9 +231,6 @@ class EnhancedQuizService {
         wikipediaSources: context.articles.map(article => article.title)
       }))
     };
-    
-    console.log('Enhanced quiz with sources:', enhancedQuiz);
-    console.log('Wikipedia enhanced flag set to:', enhancedQuiz.wikipediaEnhanced);
     
     return enhancedQuiz;
   }

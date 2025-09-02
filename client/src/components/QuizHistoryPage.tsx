@@ -33,8 +33,6 @@ const QuizHistoryPage: React.FC = () => {
       }
       
       const historyData: QuizHistory[] = await response.json();
-      console.log('Quiz history data from backend:', historyData);
-      console.log('Wikipedia enhanced flags:', historyData.map(quiz => ({ id: quiz.id, topic: quiz.topic, wikipediaEnhanced: quiz.wikipediaEnhanced })));
       
 
       

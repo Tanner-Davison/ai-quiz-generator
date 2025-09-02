@@ -15,7 +15,7 @@ import {
   QuizHistoryPage,
 } from "./components";
 
-import type { QuizResponse, QuizResult } from "./types/quiz";
+import type { QuizResponse, QuizResult, QuizHistory } from "./types/quiz";
 import { enhancedQuizService } from "./services/enhancedQuizService";
 import { scoreService } from "./services/scoreService";
 
@@ -79,11 +79,9 @@ const QuizGeneratorPage: React.FC = () => {
       }
       
       const historyData = await response.json();
-      console.log('Loaded quiz history:', historyData);
-      console.log('Wikipedia enhanced flags in history:', historyData.map((quiz: any) => ({ id: quiz.id, topic: quiz.topic, wikipediaEnhanced: quiz.wikipediaEnhanced })));
       
       // Convert QuizHistory to QuizResult format for display
-      const quizResults = historyData.map((quiz: any) => ({
+      const quizResults = historyData.map((quiz) => ({
         quiz_id: quiz.id,
         topic: quiz.topic,
         user_answers: [],
@@ -98,7 +96,6 @@ const QuizGeneratorPage: React.FC = () => {
         total_attempts: quiz.submission_count
       }));
       
-      console.log('Converted history with wikipediaEnhanced flags:', quizResults.map(quiz => ({ id: quiz.quiz_id, topic: quiz.topic, wikipediaEnhanced: quiz.wikipediaEnhanced })));
       setQuizHistory(quizResults);
     } catch (error) {
       console.error('Error loading quiz history:', error);
