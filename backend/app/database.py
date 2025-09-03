@@ -1,3 +1,5 @@
+"""Database configuration and session management."""
+
 import os
 
 from sqlalchemy import create_engine
@@ -5,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-from .config import settings
+from app.config import settings
 
 
 def get_async_database_url():
@@ -25,7 +27,6 @@ def get_sync_database_url():
 
 
 async_engine = create_async_engine(get_async_database_url(), echo=False, future=True)
-
 sync_engine = create_engine(
     get_sync_database_url(),
     echo=False,
@@ -34,7 +35,6 @@ sync_engine = create_engine(
 AsyncSessionLocal = async_sessionmaker(
     async_engine, class_=AsyncSession, expire_on_commit=False
 )
-
 SyncSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=sync_engine)
 
 Base = declarative_base()
@@ -49,6 +49,7 @@ async def get_async_db() -> AsyncSession:
 
 
 def get_sync_db():
+    """Sync database session dependency."""
     db = SyncSessionLocal()
     try:
         yield db
@@ -57,11 +58,14 @@ def get_sync_db():
 
 
 async def init_db():
+    """Initialize database tables."""
     async with async_engine.begin() as conn:
-        from .models.database_models import Quiz, QuizQuestion, QuizSubmission
+        # Import models here to avoid circular imports
+        from app.models.database_models import Quiz, QuizQuestion, QuizSubmission
 
         await conn.run_sync(Base.metadata.create_all)
 
 
 async def close_db():
+    """Close database connections."""
     await async_engine.dispose()

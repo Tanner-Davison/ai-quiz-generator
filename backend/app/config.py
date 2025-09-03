@@ -15,7 +15,6 @@ class Settings:
         else ENVIRONMENT == "development"
     )
 
-    # Database Configuration
     DATABASE_URL: str = os.getenv(
         "DATABASE_URL", "postgresql://postgres:password@localhost:5432/ai_quiz_dev"
     )

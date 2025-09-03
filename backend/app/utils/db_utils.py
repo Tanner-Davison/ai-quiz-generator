@@ -1,3 +1,5 @@
+"""Database utility functions for health checks and raw SQL operations."""
+
 import logging
 from typing import Any, Dict, Optional
 
@@ -13,7 +15,7 @@ async def check_database_connection(db: AsyncSession) -> bool:
         result = await db.execute(text("SELECT 1"))
         return True
     except Exception as e:
-        logger.error(f"Database connection check failed: {e}")
+        logger.error("Database connection check failed: %s", e)
         return False
 
 
@@ -39,7 +41,7 @@ async def get_database_info(db: AsyncSession) -> Optional[Dict[str, Any]]:
             "status": "connected",
         }
     except Exception as e:
-        logger.error(f"Failed to get database info: {e}")
+        logger.error("Failed to get database info: %s", e)
         return None
 
 
@@ -51,7 +53,7 @@ async def execute_raw_sql(
         result = await db.execute(text(sql), params or {})
         return result
     except Exception as e:
-        logger.error(f"Raw SQL execution failed: {e}")
+        logger.error("Raw SQL execution failed: %s", e)
         raise
 
 
@@ -85,5 +87,5 @@ async def health_check_database(db: AsyncSession) -> Dict[str, Any]:
             "timestamp": "now()",
         }
     except Exception as e:
-        logger.error(f"Database health check failed: {e}")
+        logger.error("Database health check failed: %s", e)
         return {"status": "error", "error": str(e), "timestamp": "now()"}
