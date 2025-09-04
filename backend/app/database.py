@@ -5,8 +5,17 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from app.config import settings
 
-# Create async engine directly
-async_engine = create_async_engine(settings.DATABASE_URL, echo=False, future=True)
+
+def get_async_database_url():
+    """Convert sync DATABASE_URL to async format"""
+    db_url = settings.DATABASE_URL
+    if db_url.startswith("postgresql://"):
+        return db_url.replace("postgresql://", "postgresql+asyncpg://", 1)
+    return db_url
+
+
+# Create async engine with proper async driver
+async_engine = create_async_engine(get_async_database_url(), echo=False, future=True)
 
 AsyncSessionLocal = async_sessionmaker(
     async_engine, class_=AsyncSession, expire_on_commit=False
