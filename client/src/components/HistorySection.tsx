@@ -59,7 +59,7 @@ const HistorySection: React.FC<HistorySectionProps> = ({ quizHistory }) => {
                     {result.global_average_score > 0
                       ? result.global_average_score.toFixed(0)
                       : 0}
-                    %
+                    % 🌍
                   </span>
                 )}
               </div>
@@ -67,6 +67,7 @@ const HistorySection: React.FC<HistorySectionProps> = ({ quizHistory }) => {
             <div className={styles.historyItemDetails}>
               <span className={styles.historyItemDate}>
                 {new Date(result.submitted_at).toLocaleDateString()}
+                :wa
               </span>
               <div
                 style={{
