@@ -9,6 +9,7 @@ interface HistorySectionProps {
 }
 
 const HistorySection: React.FC<HistorySectionProps> = ({ quizHistory }) => {
+  console.log(quizHistory);
   if (quizHistory.length === 0) {
     return (
       <div className={styles.historySection}>
@@ -25,9 +26,9 @@ const HistorySection: React.FC<HistorySectionProps> = ({ quizHistory }) => {
   return (
     <div className={styles.historySection}>
       <div className={styles.historyHeader}>
-        <h3 className={styles.historyTitle}>Recent Quiz History</h3>
+        <h3 className={styles.historyTitle}>Recently Generated Quizzes</h3>
         <Link to="/history" className={styles.historySubtitle}>
-          view all generated quizzes
+          view all quizzes
         </Link>
       </div>
       <ul className={styles.historyList}>
@@ -43,12 +44,24 @@ const HistorySection: React.FC<HistorySectionProps> = ({ quizHistory }) => {
                 )}
               </div>
               <div className={styles.historyItemScore}>
-                <span className={styles.scoreBadge}>
-                  {result.score}/{result.total_questions}
-                </span>
-                <span className={styles.percentageBadge}>
-                  {result.percentage ? result.percentage.toFixed(0) : 0}%
-                </span>
+                {result.personal_average_score && (
+                  <span className={styles.percentageBadge}>
+                    {result.personal_average_score > 0
+                      ? result.personal_average_score.toFixed(0)
+                      : 0}
+                    %
+                  </span>
+                )}
+                {result.global_average_score && (
+                  <span
+                    className={`${styles.percentageBadge} ${styles.global}`}
+                  >
+                    {result.global_average_score > 0
+                      ? result.global_average_score.toFixed(0)
+                      : 0}
+                    %
+                  </span>
+                )}
               </div>
             </div>
             <div className={styles.historyItemDetails}>
@@ -72,7 +85,7 @@ const HistorySection: React.FC<HistorySectionProps> = ({ quizHistory }) => {
                       {result.personal_attempts || 0} attempts)
                     </span>
                   )}
-                <span style={{ color: "#6b7280" }}>
+                <span style={{ color: "#1e40af" }}>
                   🌍 Global Avg:{" "}
                   {result.global_average_score !== null &&
                   result.global_average_score !== undefined

@@ -86,6 +86,14 @@
   font-weight: 600;
 }
 
+.percentageBadge.global {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
 .historyItemDetails {
   display: flex;
   justify-content: space-between;
