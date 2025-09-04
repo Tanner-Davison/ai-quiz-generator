@@ -7,8 +7,7 @@ from fastapi import FastAPI
 
 from app.config import settings
 from app.database import close_db, init_db
-from app.middleware.cors import add_cors_middleware
-from app.middleware.logging import add_logging_middleware
+from app.middleware import add_cors_middleware, add_logging_middleware
 from app.routes import health, quiz
 
 # Configure logging based on environment

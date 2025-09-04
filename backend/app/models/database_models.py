@@ -102,37 +102,3 @@ class QuizAnswer(Base):
     question = relationship("QuizQuestion", back_populates="answers")
 
 
-class ChatSession(Base):
-    """Chat session model for storing conversation history."""
-
-    __tablename__ = "chat_sessions"
-
-    id = Column(String, primary_key=True, default=generate_uuid)
-    user_id = Column(String(100))  # Optional user identification
-    model = Column(String(100))
-    system_prompt = Column(Text, default="You are a helpful assistant.")
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
-
-    # Relationships
-    messages = relationship(
-        "ChatMessage", back_populates="session", cascade="all, delete-orphan"
-    )
-
-
-class ChatMessage(Base):
-    """Chat message model for individual messages in conversations."""
-
-    __tablename__ = "chat_messages"
-
-    id = Column(String, primary_key=True, default=generate_uuid)
-    session_id = Column(String, ForeignKey("chat_sessions.id"), nullable=False)
-    role = Column(String(50), nullable=False)  # 'user', 'assistant', 'system'
-    content = Column(Text, nullable=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    model = Column(String(100))
-    usage = Column(JSON)  # Store token usage information
-    finish_reason = Column(String(100))
-
-    # Relationships
-    session = relationship("ChatSession", back_populates="messages")

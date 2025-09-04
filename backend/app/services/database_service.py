@@ -118,18 +118,3 @@ class QuizSubmissionService(DatabaseService):
         return await self.get_many_by_field(db, "quiz_id", quiz_id)
 
 
-class ChatSessionService(DatabaseService):
-    """Service for ChatSession model operations."""
-
-    async def get_with_messages(self, db: AsyncSession, record_id: str):
-        """Get chat session with all messages loaded"""
-        result = await db.execute(
-            select(self.model)
-            .options(selectinload(self.model.messages))
-            .where(self.model.id == record_id)
-        )
-        return result.scalar_one_or_none()
-
-    async def get_by_user(self, db: AsyncSession, user_id: str) -> List:
-        """Get chat sessions by user ID"""
-        return await self.get_many_by_field(db, "user_id", user_id)
