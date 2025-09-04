@@ -1,8 +1,9 @@
 {
-    "venvPath": "/home/tanner/projects/react/ai-test-generator/backend",
-    "venv": "venv",
-    "pythonPath": "/home/tanner/projects/react/ai-test-generator/backend/venv/bin/python",
-    "extraPaths": [
-        "/home/tanner/projects/react/ai-test-generator/backend/venv/lib/python3.12/site-packages"
-    ]
+  "venvPath": "/home/tanner/projects/react/ai-test-generator/backend",
+  "venv": "venv",
+  "pythonPath": "/home/tanner/projects/react/ai-test-generator/backend/venv/bin/python",
+  "extraPaths": [
+    "/home/tanner/projects/react/ai-test-generator/backend/venv/lib/python3.12/site-packages"
+  ],
+  "exclude": ["app/services/ai_service.py", "alembic/", "**/migrations/**"]
 }

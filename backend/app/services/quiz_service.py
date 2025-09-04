@@ -32,8 +32,7 @@ class QuizService:
         self.inappropriate_topics = {
             "vagina",
             "nipple",
-            "sphincter",
-            "feces",
+            "boobs",
             "penis",
             "breast",
             "sexual",
@@ -276,4 +275,3 @@ The correct_answer should be the index (0-3) of the correct option."""
 
 # Global instance
 quiz_service = QuizService()
-
