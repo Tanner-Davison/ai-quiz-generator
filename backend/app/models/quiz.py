@@ -1,6 +1,10 @@
-from typing import List, Optional
+"""Quiz Classes"""
+
 from datetime import datetime
+from typing import List, Optional
+
 from pydantic import BaseModel
+
 
 class QuizRequest(BaseModel):
     topic: str
@@ -9,17 +13,20 @@ class QuizRequest(BaseModel):
     wikipediaEnhanced: Optional[bool] = False
     enhancedPrompt: Optional[str] = None
 
+
 class QuizQuestion(BaseModel):
     question: str
     options: List[str]
     correct_answer: int
     explanation: str
 
+
 class WikipediaContext(BaseModel):
     articles: List[dict] = []
     key_facts: List[str] = []
     related_topics: List[str] = []
     summary: str = ""
+
 
 class QuizResponse(BaseModel):
     quiz_id: Optional[str] = None
@@ -29,9 +36,11 @@ class QuizResponse(BaseModel):
     wikipedia_context: Optional[WikipediaContext] = None
     wikipedia_enhanced: Optional[bool] = False
 
+
 class QuizSubmission(BaseModel):
     quiz_id: str
     answers: List[int]
+
 
 class QuizResult(BaseModel):
     quiz_id: str
@@ -43,6 +52,7 @@ class QuizResult(BaseModel):
     percentage: float
     submitted_at: str
     feedback: List[str]
+
 
 class QuizHistory(BaseModel):
     id: str
