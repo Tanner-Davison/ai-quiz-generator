@@ -4,11 +4,11 @@ from typing import Any, Generic, List, Optional, Type, TypeVar
 
 from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import DeclarativeBase, selectinload
 
 from app.database import Base
 
-T = TypeVar("T", bound=Base)
+T = TypeVar("T", bound=DeclarativeBase)
 
 
 class DatabaseService(Generic[T]):
@@ -116,5 +116,3 @@ class QuizSubmissionService(DatabaseService):
     async def get_by_quiz(self, db: AsyncSession, quiz_id: str) -> List:
         """Get all submissions for a specific quiz"""
         return await self.get_many_by_field(db, "quiz_id", quiz_id)
-
-
