@@ -34,9 +34,6 @@ quiz_db_service = QuizDatabaseService(Quiz)
 question_db_service = QuizQuestionService(QuizQuestion)
 submission_db_service = QuizSubmissionService(DBQuizSubmission)
 
-# In-memory storage (temporary - replace with database-only approach)
-current_quiz = None
-quiz_results = []
 
 
 @router.post("/generate", response_model=QuizResponse)
@@ -46,7 +43,6 @@ async def generate_quiz(
     db: AsyncSession = Depends(get_async_db),
 ):
     """Generate a quiz based on the given topic"""
-    global current_quiz
 
     try:
         # Override model if specified
@@ -63,8 +59,6 @@ async def generate_quiz(
         quiz_id = await _save_quiz_to_database(db, request, result)
         result.quiz_id = quiz_id
 
-        # Store in memory as fallback
-        current_quiz = result
 
         return result
 
@@ -124,8 +118,6 @@ async def submit_quiz(
         # Save submission to database
         await _save_submission_to_database(db, submission, result)
 
-        # Store in memory for backward compatibility
-        quiz_results.append(result)
 
         return result
 
@@ -137,12 +129,6 @@ async def submit_quiz(
             status_code=500,
             detail={"error": "Submission processing failed", "details": str(e)},
         )
-
-
-@router.get("/results")
-async def get_quiz_results():
-    """Get all quiz results"""
-    return {"results": quiz_results, "total": len(quiz_results)}
 
 
 @router.get("/history", response_model=List[QuizHistory])
@@ -279,17 +265,10 @@ async def _get_quiz_and_questions(db: AsyncSession, quiz_id: str):
     if quiz:
         questions = await question_db_service.get_by_quiz(db, quiz_id)
 
-    # Fallback to memory
     if not quiz or not questions:
-        if current_quiz and current_quiz.quiz_id == quiz_id:
-            quiz = type(
-                "Quiz", (), {"id": current_quiz.quiz_id, "topic": current_quiz.topic}
-            )()
-            questions = current_quiz.questions
-        else:
-            raise HTTPException(
-                status_code=400, detail="Quiz not found. Please generate a quiz first."
-            )
+        raise HTTPException(
+            status_code=404, detail="Quiz not found. Please generate a quiz first."
+        )
 
     return quiz, questions
 

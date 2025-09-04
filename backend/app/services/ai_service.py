@@ -1,3 +1,5 @@
+"""AI WRAPPER SERVICE"""
+
 from groq import Groq
 
 from app.config import settings
@@ -33,6 +35,7 @@ class AIService:
         temperature = temperature or 0.7
         max_tokens = max_tokens or 1024
 
+        # groq library has completions and create methods called below
         completion = self.client.chat.completions.create(
             messages=messages,
             model=model,
