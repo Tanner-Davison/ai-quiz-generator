@@ -5,7 +5,7 @@ from typing import List, Optional
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
 
-from app.services.wikipedia_service import wikipedia_service, WikipediaSearchResult, WikipediaArticle, FactCheckResult
+from app.services.wikipedia_service import wikipedia_service
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
