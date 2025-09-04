@@ -18,7 +18,7 @@ from ..models.quiz import (
 )
 from ..services.database_service import (
     QuizQuestionService,
-    QuizService,
+    QuizDatabaseService,
     QuizSubmissionService,
 )
 from ..services.quiz_service import quiz_service
@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 # Initialize database services with proper models
-quiz_db_service = QuizService(Quiz)
+quiz_db_service = QuizDatabaseService(Quiz)
 question_db_service = QuizQuestionService(QuizQuestion)
 submission_db_service = QuizSubmissionService(DBQuizSubmission)
 

@@ -8,6 +8,7 @@ from sqlalchemy.orm import DeclarativeBase, selectinload
 
 from app.database import Base
 
+# Generic
 T = TypeVar("T", bound=DeclarativeBase)
 
 
@@ -76,7 +77,7 @@ class DatabaseService(Generic[T]):
 
 
 # Specific service classes for each model
-class QuizService(DatabaseService):
+class QuizDatabaseService(DatabaseService):
     """Service for Quiz model operations."""
 
     async def get_with_questions(self, db: AsyncSession, record_id: str):
