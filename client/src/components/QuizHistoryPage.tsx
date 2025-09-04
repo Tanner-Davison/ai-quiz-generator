@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { GlobalHistorySectionStyles as styles } from '../cssmodules';
+import { QuizHistoryPageStyles as styles } from '../cssmodules';
 import type { QuizHistory } from '../types/quiz';
 import WikipediaEnhancementBadge from './WikipediaEnhancementBadge';
 import { scoreService } from '../services/scoreService';
