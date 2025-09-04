@@ -54,7 +54,7 @@ async def generate_quiz(
             request.model = force_model
 
         # Generate quiz content
-        if request.enhancedPrompt and request.wikipediaEnhanced:
+        if request.wikipediaEnhanced:
             result = await quiz_service.generate_enhanced_quiz(request)
         else:
             result = await quiz_service.generate_quiz(request)

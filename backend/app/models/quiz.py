@@ -15,11 +15,19 @@ class QuizQuestion(BaseModel):
     correct_answer: int
     explanation: str
 
+class WikipediaContext(BaseModel):
+    articles: List[dict] = []
+    key_facts: List[str] = []
+    related_topics: List[str] = []
+    summary: str = ""
+
 class QuizResponse(BaseModel):
     quiz_id: Optional[str] = None
     topic: str
     questions: List[QuizQuestion]
     generated_at: str
+    wikipedia_context: Optional[WikipediaContext] = None
+    wikipedia_enhanced: Optional[bool] = False
 
 class QuizSubmission(BaseModel):
     quiz_id: str

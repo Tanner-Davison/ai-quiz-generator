@@ -8,7 +8,7 @@ from fastapi import FastAPI
 from app.config import settings
 from app.database import close_db, init_db
 from app.middleware import add_cors_middleware, add_logging_middleware
-from app.routes import health, quiz
+from app.routes import health, quiz, wikipedia
 
 # Configure logging based on environment
 logging.basicConfig(
@@ -80,6 +80,7 @@ def create_app() -> FastAPI:
     # routers
     app.include_router(health.router, tags=["Health"])
     app.include_router(quiz.router, prefix="/quiz", tags=["Quiz"])
+    app.include_router(wikipedia.router, prefix="/wikipedia", tags=["Wikipedia"])
 
     return app
 

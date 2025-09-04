@@ -33,11 +33,8 @@ class EnhancedQuizService {
 
   async generateEnhancedQuiz(topic: string): Promise<EnhancedQuizResponse> {
     try {
-      const wikipediaContext = await this.gatherWikipediaContext(topic);
-      const enhancedPrompt = this.createEnhancedPrompt(topic, wikipediaContext);
       const requestBody = {
         topic: topic.trim(),
-        enhancedPrompt: enhancedPrompt,
         wikipediaEnhanced: true,
       };
 
@@ -57,13 +54,27 @@ class EnhancedQuizService {
       }
 
       const quizData = await response.json();
-      return this.enhanceQuizWithSources(quizData, wikipediaContext);
+      
+      // Convert backend Wikipedia context to frontend format
+      const wikipediaContext: WikipediaContext = {
+        articles: quizData.wikipedia_context?.articles || [],
+        keyFacts: quizData.wikipedia_context?.key_facts || [],
+        relatedTopics: quizData.wikipedia_context?.related_topics || [],
+        summary: quizData.wikipedia_context?.summary || ""
+      };
+
+      // Add Wikipedia context to quiz data for frontend
+      const enhancedQuizData = {
+        ...quizData,
+        wikipediaContext: wikipediaContext
+      };
+
+      return this.enhanceQuizWithSources(enhancedQuizData, wikipediaContext);
     } catch (error) {
       console.error("Enhanced quiz generation error:", error);
       try {
-        const wikipediaContext = await this.gatherWikipediaContext(topic);
         const regularQuiz = await this.generateRegularQuiz(topic);
-        return this.enhanceQuizWithSources(regularQuiz, wikipediaContext);
+        return this.enhanceQuizWithSources(regularQuiz, this.createEmptyContext());
       } catch (fallbackError) {
         console.error("Fallback quiz generation error:", fallbackError);
         return this.generateRegularQuiz(topic);
@@ -244,7 +255,14 @@ class EnhancedQuizService {
       throw new Error(errorData.detail?.error || "Failed to generate quiz");
     }
 
-    return await response.json();
+    const quizData = await response.json();
+    
+    // Ensure the response has the expected structure
+    return {
+      ...quizData,
+      wikipediaContext: undefined,
+      wikipediaEnhanced: false
+    };
   }
 
   private createEmptyContext(): WikipediaContext {
@@ -258,17 +276,14 @@ class EnhancedQuizService {
 
   async getWikipediaArticles(topic: string): Promise<WikipediaArticle[]> {
     try {
-      const searchResults = await wikipediaService.searchArticles(topic, 3);
-      const articles: WikipediaArticle[] = [];
-
-      for (const result of searchResults) {
-        const article = await wikipediaService.getArticle(result.title);
-        if (article) {
-          articles.push(article);
-        }
+      const response = await fetch(`${this.API_BASE_URL}/wikipedia/articles?topic=${encodeURIComponent(topic)}&limit=3`);
+      
+      if (!response.ok) {
+        throw new Error(`Failed to get Wikipedia articles: ${response.status}`);
       }
 
-      return articles;
+      const articles = await response.json();
+      return articles || [];
     } catch (error) {
       console.error("Error getting Wikipedia articles:", error);
       return [];
