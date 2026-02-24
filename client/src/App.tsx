@@ -16,7 +16,7 @@ import {
 } from "./components";
 
 import type { QuizResponse, QuizResult, QuizHistory } from "./types/quiz";
-import { enhancedQuizService } from "./services/enhancedQuizService";
+import { generateEnhancedQuiz } from "./services/enhancedQuizService";
 import { scoreService } from "./services/scoreService";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -196,7 +196,7 @@ const QuizGeneratorPage: React.FC = () => {
     setResults(null);
 
     try {
-      const quizData: QuizResponse = await enhancedQuizService.generateEnhancedQuiz(topic.trim());
+      const quizData: QuizResponse = await generateEnhancedQuiz(topic.trim());
       setQuiz(quizData);
       setUserAnswers(new Array(quizData.questions.length).fill(-1));
     } catch (err) {
