@@ -1,9 +1,14 @@
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
-import type { WikipediaArticle } from "./wikipediaService";
+// ---- Types ----------------------------------------------------------------
 
-export interface EnhancedQuizRequest {
-  topic: string;
-  useWikipediaEnhancement?: boolean;
+export interface WikipediaArticle {
+  title: string;
+  extract: string;
+  url: string;
+  pageid: number;
+  lastrevid: number;
+  sections?: string[];
 }
 
 export interface WikipediaContext {
@@ -27,132 +32,87 @@ export interface EnhancedQuizResponse {
   wikipediaContext?: WikipediaContext;
 }
 
-class EnhancedQuizService {
-  private readonly API_BASE_URL =
-    import.meta.env.VITE_API_URL || "http://localhost:3000";
+// ---- Helpers ---------------------------------------------------------------
 
-  async generateEnhancedQuiz(topic: string): Promise<EnhancedQuizResponse> {
+function emptyContext(): WikipediaContext {
+  return { articles: [], keyFacts: [], relatedTopics: [], summary: "" };
+}
+
+function attachSources(
+  quizData: any,
+  context: WikipediaContext
+): EnhancedQuizResponse {
+  return {
+    ...quizData,
+    wikipediaContext: context,
+    questions: quizData.questions.map((q: any) => ({
+      ...q,
+      wikipediaSources: context.articles.map((a) => a.title),
+    })),
+  };
+}
+
+async function fetchQuiz(
+  topic: string,
+  wikipediaEnhanced: boolean
+): Promise<any> {
+  const res = await fetch(`${API_BASE_URL}/quiz/generate`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ topic: topic.trim(), wikipediaEnhanced }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.detail?.error || "Failed to generate quiz");
+  }
+
+  return res.json();
+}
+
+// ---- Public API ------------------------------------------------------------
+
+export async function generateEnhancedQuiz(
+  topic: string
+): Promise<EnhancedQuizResponse> {
+  try {
+    const data = await fetchQuiz(topic, true);
+
+    const context: WikipediaContext = {
+      articles: data.wikipedia_context?.articles ?? [],
+      keyFacts: data.wikipedia_context?.key_facts ?? [],
+      relatedTopics: data.wikipedia_context?.related_topics ?? [],
+      summary: data.wikipedia_context?.summary ?? "",
+    };
+
+    return attachSources(data, context);
+  } catch (error) {
+    console.error("Enhanced quiz generation error:", error);
+
     try {
-      const requestBody = {
-        topic: topic.trim(),
-        wikipediaEnhanced: true,
-      };
-
-      const response = await fetch(`${this.API_BASE_URL}/quiz/generate`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestBody),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.detail?.error || "Failed to generate enhanced quiz",
-        );
-      }
-
-      const quizData = await response.json();
-      
-      // Convert backend Wikipedia context to frontend format
-      const wikipediaContext: WikipediaContext = {
-        articles: quizData.wikipedia_context?.articles || [],
-        keyFacts: quizData.wikipedia_context?.key_facts || [],
-        relatedTopics: quizData.wikipedia_context?.related_topics || [],
-        summary: quizData.wikipedia_context?.summary || ""
-      };
-
-      // Add Wikipedia context to quiz data for frontend
-      const enhancedQuizData = {
-        ...quizData,
-        wikipediaContext: wikipediaContext
-      };
-
-      return this.enhanceQuizWithSources(enhancedQuizData, wikipediaContext);
-    } catch (error) {
-      console.error("Enhanced quiz generation error:", error);
-      try {
-        const regularQuiz = await this.generateRegularQuiz(topic);
-        return this.enhanceQuizWithSources(regularQuiz, this.createEmptyContext());
-      } catch (fallbackError) {
-        console.error("Fallback quiz generation error:", fallbackError);
-        return this.generateRegularQuiz(topic);
-      }
-    }
-  }
-
-
-  private enhanceQuizWithSources(
-    quizData: any,
-    context: WikipediaContext,
-  ): EnhancedQuizResponse {
-    const enhancedQuiz = {
-      ...quizData,
-      wikipediaContext: context,
-      wikipediaEnhanced: true,
-      questions: quizData.questions.map((question: any) => ({
-        ...question,
-        wikipediaSources: context.articles.map((article) => article.title),
-      })),
-    };
-
-    return enhancedQuiz;
-  }
-
-  private async generateRegularQuiz(
-    topic: string,
-  ): Promise<EnhancedQuizResponse> {
-    const response = await fetch(`${this.API_BASE_URL}/quiz/generate`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        topic: topic.trim(),
-        wikipediaEnhanced: false,
-      }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.detail?.error || "Failed to generate quiz");
-    }
-
-    const quizData = await response.json();
-    
-    // Ensure the response has the expected structure
-    return {
-      ...quizData,
-      wikipediaContext: undefined,
-      wikipediaEnhanced: false
-    };
-  }
-
-  private createEmptyContext(): WikipediaContext {
-    return {
-      articles: [],
-      keyFacts: [],
-      relatedTopics: [],
-      summary: "",
-    };
-  }
-
-  async getWikipediaArticles(topic: string): Promise<WikipediaArticle[]> {
-    try {
-      const response = await fetch(`${this.API_BASE_URL}/wikipedia/articles?topic=${encodeURIComponent(topic)}&limit=3`);
-      
-      if (!response.ok) {
-        throw new Error(`Failed to get Wikipedia articles: ${response.status}`);
-      }
-
-      const articles = await response.json();
-      return articles || [];
-    } catch (error) {
-      console.error("Error getting Wikipedia articles:", error);
-      return [];
+      const fallback = await fetchQuiz(topic, false);
+      return attachSources(fallback, emptyContext());
+    } catch (fallbackError) {
+      console.error("Fallback quiz generation error:", fallbackError);
+      const last = await fetchQuiz(topic, false);
+      return { ...last, wikipediaContext: undefined };
     }
   }
 }
 
-export const enhancedQuizService = new EnhancedQuizService();
+export async function getWikipediaArticles(
+  topic: string
+): Promise<WikipediaArticle[]> {
+  try {
+    const res = await fetch(
+      `${API_BASE_URL}/wikipedia/articles?topic=${encodeURIComponent(topic)}&limit=3`
+    );
+
+    if (!res.ok) throw new Error(`Failed to get Wikipedia articles: ${res.status}`);
+
+    return (await res.json()) ?? [];
+  } catch (error) {
+    console.error("Error getting Wikipedia articles:", error);
+    return [];
+  }
+}
