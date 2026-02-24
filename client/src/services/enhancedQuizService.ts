@@ -40,7 +40,7 @@ function emptyContext(): WikipediaContext {
 
 function attachSources(
   quizData: any,
-  context: WikipediaContext
+  context: WikipediaContext,
 ): EnhancedQuizResponse {
   return {
     ...quizData,
@@ -54,7 +54,7 @@ function attachSources(
 
 async function fetchQuiz(
   topic: string,
-  wikipediaEnhanced: boolean
+  wikipediaEnhanced: boolean,
 ): Promise<any> {
   const res = await fetch(`${API_BASE_URL}/quiz/generate`, {
     method: "POST",
@@ -73,7 +73,7 @@ async function fetchQuiz(
 // ---- Public API ------------------------------------------------------------
 
 export async function generateEnhancedQuiz(
-  topic: string
+  topic: string,
 ): Promise<EnhancedQuizResponse> {
   try {
     const data = await fetchQuiz(topic, true);
@@ -101,14 +101,15 @@ export async function generateEnhancedQuiz(
 }
 
 export async function getWikipediaArticles(
-  topic: string
+  topic: string,
 ): Promise<WikipediaArticle[]> {
   try {
     const res = await fetch(
-      `${API_BASE_URL}/wikipedia/articles?topic=${encodeURIComponent(topic)}&limit=3`
+      `${API_BASE_URL}/wikipedia/articles?topic=${encodeURIComponent(topic)}&limit=3`,
     );
 
-    if (!res.ok) throw new Error(`Failed to get Wikipedia articles: ${res.status}`);
+    if (!res.ok)
+      throw new Error(`Failed to get Wikipedia articles: ${res.status}`);
 
     return (await res.json()) ?? [];
   } catch (error) {
